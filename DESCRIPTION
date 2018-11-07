@@ -1,7 +1,7 @@
 Package: omixerRpm
 Type: Package
 Title: Metabolic module profiling of microbiome samples
-Version: 0.2.1
+Version: 0.2.2
 Date: 2018-11-07
 Author: Youssef Darzi
 Maintainer: Youssef Darzi<youssef.darzi@gmail.com>

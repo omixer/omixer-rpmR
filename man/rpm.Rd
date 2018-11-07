@@ -28,7 +28,7 @@ By default it is set to -1.
 One of median or mean to estimate the abundance of the module. Default is median.
 }
   \item{annotation}{
-Data annotation. Use 1 for taxonomic followed by KO annotation or 2 for KO annotation only
+Data annotation. Use 1 for KEGG KO annotation only or 2 for taxonomic followed by KO annotation.
 }
   \item{module.db}{
 A ModuleDB object to locate the database files. If omitted the GMMS database from Vieira-Silva, et al 2016 Nat Microbiol (doi:10.1038/nmicrobiol.2016.88)
@@ -66,14 +66,18 @@ Youssef Darzi
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-function (x, minimum.coverage = -1) 
-{
-  }
+# read a functional profile matrix into R or create it inside R
+dat <- read.table("test/matrix.tsv", header=T, sep="\t")
+# Run the module mapping on the loaded table.
+mods <- rpm(dat, minimum.coverage=0.3, annotation = 1)
+# alternatively run the mapping without loading the table into R.
+mods <- rpm("test/matrix.tsv", minimum.coverage=0.3, annotation = 1)
+# Load the default mapping database
+db <- loadDefaultDB()
+# get the name of the first predicted module
+getNames(db, mods@annotation[1,])
+  
+  
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
