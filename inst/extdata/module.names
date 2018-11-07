@@ -1,0 +1,103 @@
+MF0001	arabinoxylan degradation
+MF0002	fructan degradation
+MF0003	pectin degradation I
+MF0004	pectine degradation II
+MF0005	starch degradation
+MF0006	lactose degradation
+MF0007	lactose and galactose degradation
+MF0008	maltose degradation
+MF0009	melibiose degradation
+MF0010	sucrose degradation I
+MF0011	sucrose degradation II
+MF0012	trehalose degradation
+MF0013	allose degradation
+MF0014	arabinose degradation
+MF0015	fructose degradation
+MF0016	fucose degradation
+MF0017	galactose degradation
+MF0018	mannose degradation
+MF0019	rhamnose degradation
+MF0020	ribose degradation
+MF0021	xylose degradation
+MF0022	galacturonate degradation I
+MF0023	galacturonate degradation II
+MF0024	phenylalanine degradation
+MF0025	tryptophan degradation
+MF0026	tyrosine degradation I
+MF0027	tyrosine degradation II
+MF0028	aspartate degradation I
+MF0029	aspartate degradation II
+MF0030	glutamate degradation I
+MF0031	glutamate degradation II
+MF0032	glutamate degradation III
+MF0033	alanine degradation I
+MF0034	alanine degradation II
+MF0035	glycine degradation
+MF0036	isoleucine degradation
+MF0037	leucine degradation
+MF0038	methionine degradation I
+MF0039	methionine degradation II
+MF0040	proline degradation
+MF0041	valine degradation I
+MF0042	asparagine degradation
+MF0043	cysteine biosynthesis/homocysteine degradation
+MF0044	cysteine degradation I
+MF0045	cysteine degradation II
+MF0046	glutamine degradation I
+MF0047	glutamine degradation II
+MF0048	serine degradation
+MF0049	threonine degradation I
+MF0050	threonine degradation II
+MF0051	arginine degradation I
+MF0052	arginine degradation II
+MF0053	arginine degradation III
+MF0054	arginine degradation IV
+MF0055	arginine degradation V
+MF0056	histidine degradation
+MF0057	lysine degradation I
+MF0058	lysine degradation II
+MF0059	anaerobic fatty acid beta-oxidation
+MF0060	glycerol degradation I
+MF0061	glycerol degradation II
+MF0062	glycerol degradation III
+MF0063	glyoxylate bypass
+MF0064	triacylglycerol degradation
+MF0065	Bifidobacterium shunt
+MF0066	Entner-Doudoroff pathway
+MF0067	glycolysis (preparatory phase)
+MF0068	glycolysis (pay-off phase)
+MF0069	NADH:ferredoxin oxidoreductase
+MF0070	pentose phosphate pathway (oxidative phase)
+MF0071	pentose phosphate pathway (non-oxidative branch)
+MF0072	pyruvate dehydrogenase complex
+MF0073	pyruvate:ferredoxin oxidoreductase
+MF0074	pyruvate:formate lyase
+MF0075	acetate to acetyl-CoA
+MF0076	4-aminobutyrate degradation
+MF0077	formate conversion
+MF0078	lactaldehyde degradation
+MF0079	lactate consumption I
+MF0080	lactate consumption II
+MF0081	methanol conversion
+MF0082	putrescine degradation
+MF0083	succinate consumption
+MF0084	succinate conversion to propionate
+MF0085	urea degradation
+MF0086	acetyl-CoA to acetate
+MF0087	acetyl-CoA to crotonyl-CoA
+MF0088	butyrate production I
+MF0089	butyrate production II
+MF0090	ethanol production I
+MF0091	ethanol production II
+MF0092	lactate production
+MF0093	propionate production I
+MF0094	propionate production II
+MF0095	propionate production III
+MF0096	succinate production
+MF0097	homoacetogenesis
+MF0098	hydrogen metabolism
+MF0099	methanogenesis - methyl-coM
+MF0100	methanogenesis from carbon dioxide
+MF0101	nitrate reduction (dissimilatory)
+MF0102	sulfate reduction (dissimilatory)
+MF0103	mucin degradation
