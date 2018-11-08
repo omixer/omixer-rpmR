@@ -14,7 +14,7 @@ follows after replacing x.y.z by the correct version
 ##### From source
 Download the latest source from [the release page](https://github.com/omixer/omixer-rpmR/releases), then install it as follows after replacing x.y.z by the correct version 
 
-<code>R CMD INSTALL x.y.z.tar.gz</code>
+<code>R CMD INSTALL omixer-rpmR-x.y.z.tar.gz</code>
 
 
 #### Usage example
