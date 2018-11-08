@@ -1,6 +1,7 @@
 # x is a dataframe or a valid file path
 # Add the Description of modules as a data object
-rpm <- function(x, minimum.coverage=-1, score.estimator="median", annotation = 1, module.db = NULL, threads = 1, normalize.by.length = FALSE, distribute = FALSE) {
+rpm <- function(x, minimum.coverage=-1, score.estimator="median", annotation = 1, module.db = NULL, threads = 1,
+		normalize.by.length = FALSE, distribute = FALSE, java.mem=NULL) {
 	# link to the GMMs executable and DB
 	rpm.exec <- system.file("java", "omixer-rpm.jar", package = "omixerRpm")
 	if(is.null(module.db)) {
@@ -22,9 +23,15 @@ rpm <- function(x, minimum.coverage=-1, score.estimator="median", annotation = 1
 	} else {
 		input <- x
 	}
+
+	# Compiling the command
+	command <- "java -server"
 	
-	# Run the module mapping 
-	command <- paste("java -jar", rpm.exec, 
+	if(!is.null(java.mem)){
+		command <- paste(command, paste0("-Xmx", java.mem, "G"))
+	}
+	
+	command <- paste(command , "-jar", rpm.exec, 
 			"-c" , minimum.coverage,
 			"-s", score.estimator,
 			"-d", file.path(module.db@directory, module.db@modules),
@@ -40,7 +47,8 @@ rpm <- function(x, minimum.coverage=-1, score.estimator="median", annotation = 1
 	if( distribute == TRUE) { 
 		command <-paste(command, "--Xdistribute")
 	}
-
+	
+	# Run the module mapping 
 	tryCatch({
 				system(command)
 			},
