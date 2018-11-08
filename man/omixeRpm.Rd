@@ -38,6 +38,16 @@ of the human gut microbiome, Nature Microbiology, 2016 .http://www.nature.com/ar
 ~~ \code{\link[<pkg>:<pkg>-package]{<pkg>}} ~~
 }
 \examples{
-~~ simple examples of the most important functions ~~
-rpm()
+\dontrun{
+# read a functional profile matrix into R or create it inside R
+dat <- read.table("matrix.tsv", header=T, sep="\t")
+# Run the module mapping on the loaded table.
+mods <- rpm(dat, minimum.coverage=0.3, annotation = 1)
+# alternatively run the mapping without loading the table into R.
+mods <- rpm("matrix.tsv", minimum.coverage=0.3, annotation = 1)
+# Load the default mapping database
+db <- loadDefaultDB()
+# get the name of the first predicted module
+getNames(db, mods@annotation[1,]) 
+}
 }

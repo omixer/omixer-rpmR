@@ -18,6 +18,20 @@ test.moduleMapping <- function (){
 	checkEquals(ncol(taxon.mods@coverage), 2)
 }
 
+test.callOptions <- {
+	# check default
+	mods <- rpm("test/matrix.tsv", annotation = 1, minimum.coverage=0.66)
+	checkEquals(mods@abundance[which(mods@annotation == 'MF0004'), "S1"], 5457.398359)
+
+	# check with length normalization
+	mods <- rpm("test/matrix.tsv", annotation = 1, minimum.coverage=0.66, normalize.by.length = TRUE)
+	checkEquals(mods@abundance[which(mods@annotation == 'MF0004'), "S1"], 708.5907183)
+	
+	# check with length normalization AND --Xdistribute
+	mods <- rpm("test/matrix.tsv", annotation = 1, minimum.coverage=0.66, normalize.by.length = TRUE, distribute = TRUE)
+	checkEquals(mods@abundance[which(mods@annotation == 'MF0004'), "S1"], 236.1969061)
+}
+
 # See code comments
 test.moduleDbAnnotation <- function() {
 	# Setup the module database. This is an alternative to loadDefaultDB()
