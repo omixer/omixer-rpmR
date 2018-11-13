@@ -25,7 +25,7 @@ If set to -1 the threshold is guessed from the data. Otherwise the value should 
 By default it is set to -1.
 }
   \item{score.estimator}{
-One of median or mean to estimate the abundance of the module. Default is median.
+One of [median|average|sum|min] to estimate the abundance of the module. Default is median.
 }
   \item{annotation}{
 Data annotation. Use 1 for KEGG KO annotation only or 2 for taxonomic followed by KO annotation.
