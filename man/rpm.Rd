@@ -11,7 +11,7 @@ Generates metabolic module profiles from metagenomic samples.
 }
 \usage{
 rpm(x, minimum.coverage = -1, score.estimator = "median", 
-    annotation = 1, module.db = NULL, threads = 1, normalize.by.length = FALSE, distribute = FALSE)
+    annotation = 1, module.db = NULL, threads = 1, normalize.by.length = FALSE, distribute = FALSE, java.mem = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -47,7 +47,9 @@ the number of observed reactions
   \item{distribute}{
 Experimental feature - When an ortholog is shared by N modules then its abundance is divided by N.
 }
- 
+  \item{java.mem}{
+The maximum amount of memory (in Gb) to allocate for the underlying omixer-rpm.jar tool. Value is an Integer comprised between 1 and the RAM size.
+} 
 
 }
 \details{
