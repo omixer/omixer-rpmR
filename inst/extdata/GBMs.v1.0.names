@@ -1,0 +1,56 @@
+MGB001	Serotonin synthesis I
+MGB002	Serotonin synthesis II
+MGB003	Melatonin synthesis
+MGB004	Kynurenine synthesis
+MGB005	Tryptophan synthesis
+MGB006	Glutamate synthesis I
+MGB007	Glutamate synthesis II
+MGB008	Acetylcholine synthesis
+MGB009	Histamine synthesis
+MGB010	Histamine degradation
+MGB011	Cortisol degradation
+MGB012	Dopamine synthesis
+MGB013	Noradrenaline synthesis
+MGB014	Adrenaline synthesis
+MGB015	p-Cresol synthesis
+MGB016	p-Cresol degradation
+MGB017	IPA synthesis (Clostridium sporogenes pathway)
+MGB018	Kynurenine degradation
+MGB019	GABA degradation
+MGB020	GABA synthesis I
+MGB021	GABA synthesis II
+MGB022	GABA synthesis III
+MGB023	Dopamine degradation
+MGB024	DOPAC synthesis
+MGB025	Nitric oxide synthesis I (NO synthase)
+MGB026	Nitric oxide synthesis II (nitrite reductase)
+MGB027	Nitric oxide degradation I (NO dioxygenase)
+MGB028	Nitric oxide degradation II (NO reductase)
+MGB029	ClpB (ATP-dependent chaperone protein)
+MGB030	Polysaccharide A
+MGB031	17-beta-Estradiol degradation
+MGB032	Quinolinic acid synthesis
+MGB033	Quinolinic acid degradation
+MGB034	Isovaleric acid synthesis I (KADH pathway)
+MGB035	Isovaleric acid synthesis II (KADC pathway)
+MGB036	S-Adenosylmethionine (SAM) synthesis
+MGB037	Inositol synthesis
+MGB038	Inositol degradation
+MGB039	g-Hydroxybutyric acid (GHB) degradation
+MGB040	Menaquinone synthesis (vitamin K2) I
+MGB041	Menaquinone synthesis (vitamin K2) II (alternative pathway: futalosine pathway)
+MGB042	PUFAs synthesis (AA, EPA, DHA)
+MGB043	Acetate synthesis I
+MGB044	Acetate synthesis II
+MGB045	Acetate synthesis III
+MGB046	Acetate synthesis IV
+MGB047	Acetate degradation
+MGB048	Propionate synthesis I
+MGB049	Tryptophan degradation
+MGB050	Glutamate degradation I
+MGB051	Glutamate degradation II
+MGB052	Butyrate synthesis I
+MGB053	Butyrate synthesis II
+MGB054	Propionate synthesis II
+MGB055	Propionate synthesis III
+MGB056	Propionate degradation I

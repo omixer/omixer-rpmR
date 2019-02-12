@@ -22,7 +22,7 @@ The name of the module definition file in the database. Defaults to modules.list
 The file should follow the KEGG format for module definition
 }
   \item{hierarchy.file}{
-The name of the module hierarchy definition file in the database. Defaults to hierarchy.tsv
+The name of the module hierarchy definition file in the database. Defaults to hierarchy.tsv [NOT USED FOR NOW]
 }
   \item{module.names.file}{
 The name of the module names file in the database. Defaults to modules.names
@@ -52,17 +52,11 @@ Youssef Darzi
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+\dontrun{
+db <- ModuleDB(directory = "/path/to/moduledb/", modules = "GBM.v1.0.txt", module.names.file="GBMs.v1.0.names")
+# Serotonin synthesis I
+getNames(db, "MGB001") 
 }
-\examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-function (x, minimum.coverage = -1) 
-{
-  }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

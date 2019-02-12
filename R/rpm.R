@@ -5,8 +5,7 @@ rpm <- function(x, minimum.coverage=-1, score.estimator="median", annotation = 1
 	# link to the GMMs executable and DB
 	rpm.exec <- system.file("java", "omixer-rpm.jar", package = "omixerRpm")
 	if(is.null(module.db)) {
-		module.db.path <- system.file("extdata", package = "omixerRpm")
-		module.db <- ModuleDB(directory = module.db.path, modules = "GMMs.v1.07.txt")
+		module.db <- loadDefaultDB()
 	}
 	
 	# Prepare output directories

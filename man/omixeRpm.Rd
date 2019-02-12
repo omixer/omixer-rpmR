@@ -39,7 +39,7 @@ of the human gut microbiome, Nature Microbiology, 2016 .http://www.nature.com/ar
 }
 \examples{
 \dontrun{
-# read a functional profile matrix into R or create it inside R
+# read a functional profile matrix into R or create it inside R. Please note that row.names should not be used while reading the matrix. 
 dat <- read.table("matrix.tsv", header=T, sep="\t")
 # Run the module mapping on the loaded table.
 mods <- rpm(dat, minimum.coverage=0.3, annotation = 1)

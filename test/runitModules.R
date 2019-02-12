@@ -34,8 +34,24 @@ test.callOptions <- {
 
 # See code comments
 test.moduleDbAnnotation <- function() {
-	# Setup the module database. This is an alternative to loadDefaultDB()
-	db <- ModuleDB(directory = "./inst/extdata", modules = "GMMs.v1.07.txt")
+	# Setup the default module database.
+	db <- loadDefaultDB()
+	# check getNames returns the correct annotation
+	checkEquals(getNames(db, "MF0010"), "sucrose degradation I")
+}
+
+test.moduleDbList <- function() {
+	# List available databases.
+	db <- listDB()
+	# check getNames returns the correct annotation
+	checkEquals(db[1], "GBMs.v1.0")
+	checkEquals(db[2], "GMMs.v1.07")
+}
+
+# See code comments
+test.moduleDbLoad <- function() {
+	# Setup the default module database.
+	db <- loadDB("GMMs.v1.07")
 	# check getNames returns the correct annotation
 	checkEquals(getNames(db, "MF0010"), "sucrose degradation I")
 }
