@@ -40,6 +40,19 @@ test.moduleDbAnnotation <- function() {
 	checkEquals(getNames(db, "MF0010"), "sucrose degradation I")
 }
 
+
+test.asDataFrame <- {
+	# check default
+	mods <- rpm("test/matrix.tsv", annotation = 1, minimum.coverage=0.3)
+	coverage <- asDataFrame(mods, "coverage")
+	print(coverage)
+	checkEquals(nrow(coverage), 96)
+	checkEquals(ncol(coverage), 4)
+	checkEquals(as.character(coverage[1, "Description"]), "glyoxylate bypass")
+	checkEquals(as.character(coverage[96, "Description"]), "maltose degradation")
+}
+
+
 test.moduleDbList <- function() {
 	# List available databases.
 	db <- listDB()

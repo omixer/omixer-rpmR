@@ -81,5 +81,5 @@ rpm <- function(x, minimum.coverage=-1, score.estimator="median", annotation = 1
 		colnames(coverage) <- abundance.colnames[3:length(abundance.colnames)]
 	}
 	
-	Modules(abundance=abundance, coverage=coverage, annotation=annotation.df) 
+	Modules(abundance=abundance, coverage=coverage, annotation=annotation.df, db=module.db) 
 }

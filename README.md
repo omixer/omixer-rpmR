@@ -2,7 +2,7 @@
 An R interface to [omixer-rpm](https://github.com/raeslab/omixer-rpm), the tool for metabolic module profiling of microbiome samples
 
 #### Dependencies 
-R and Java8
+R and Java8 (Docker users, please make sure Java8 is part of the R image)
 
 #### Installation
 ##### Binaries for Linux only (tested on 16.04.1-Ubuntu) 
@@ -35,6 +35,9 @@ mods &lt;- rpm("matrix.tsv", minimum.coverage=0.3, annotation = 1)
 db &lt;- loadDefaultDB()
 # get the name of the first predicted module
 getNames(db, mods@annotation[1,])
+
+# get the abundance|coverage as a data.frame with module id and description
+coverage <- asDataFrame(mods, "coverage")
 </pre>
 
 
