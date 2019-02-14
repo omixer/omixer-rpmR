@@ -51,10 +51,17 @@ rpm <- function(x, minimum.coverage=-1, score.estimator="median", annotation = 1
 	tryCatch({
 				system(command)
 			},
+			warning = function (e) {
+				print(e)
+				if(e$message == "error in running command"){
+					stop(e)	
+				}
+			},
 			error = function (e) {
 				print(geterrmessage())
 				stop(e)
-	})
+			}
+	)
 
 	abundance <- read.table(file.path(out.dir, "modules.tsv"), sep="\t", header=TRUE)
 	coverage <- read.table(file.path(out.dir, "modules-coverage.tsv"), sep="\t", header=TRUE)
