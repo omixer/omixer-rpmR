@@ -16,12 +16,6 @@ runRpm <- function(input) {
 
   data <- modules@coverage
 
-  # TODO 
-  # annotated the data frame before plotting it 
-  # plot the coverage with ggplot
-  # add a table for coverage
-  # add a download button
-
   response <<- data
 }
 
