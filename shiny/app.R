@@ -11,11 +11,12 @@ runRpm <- function(input) {
   module.db <- loadDB(input$module.db)
   # get the annotation value from the first charachter of the input 
   annotation <- substring(input$annotation, 1, 1)
-  # run rpm rpm mapping with user input 
+  # run rpm mapping with user input
   modules <- rpm(x = input$matrix$datapath, minimum.coverage = input$minimum.coverage, annotation = annotation, module.db = module.db)
-
-  data <- modules@coverage
-
+  # collect module names
+  module.names <- apply(data.frame(Module=modules@annotation$Module), 1, function(x) getNames(modules@db, x))
+  # create a dataframe with modules, names and abundance
+  data <- cbind(modules@annotation, Names=module.names, modules@abundance)
   response <<- data
 }
 
@@ -56,7 +57,7 @@ ui <- fluidPage(
                   label = "Input file annotation",
                   choices = c("1: orthologs only", "2: taxonomic annotation followed by orthologs")),
  # -c,--coverage                The minimum coverage cut-off to accept a module [0.0 to 1.0].
- # Defaults to -1, where the coverage is learned from the coverage distribution of all modules     
+ # Defaults to -1, where the coverage is learned from the coverage distribution of all modules
       sliderInput(inputId = "minimum.coverage",
                   label = "The minimum pathway coverage to consider a module present",
                   min = 0,
