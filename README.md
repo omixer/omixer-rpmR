@@ -16,7 +16,7 @@ Download the latest source from [the release page](https://github.com/omixer/omi
 
 <code>R CMD INSTALL omixer-rpmR-x.y.z.tar.gz</code>
 
-##### Docker Shiny
+##### Docker Shiny [experimental]
 Start the docker container 
 ```bash
 docker run --rm -ti -p 3838:3838 -v $PWD:/workspace omixer/shinyrpm:0.1
