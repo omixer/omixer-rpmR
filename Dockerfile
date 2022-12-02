@@ -4,7 +4,7 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends default-jdk \
  && rm -rf /var/lib/apt/lists/*
 
-RUN R -e 'install.packages("DT", repos="http://cran.us.r-project.org",dependencies=TRUE, verbose=T, quiet=T, clean=T)' \
+RUN R -e 'install.packages(c("DT", "shinymaterial"), repos="http://cran.us.r-project.org",dependencies=TRUE, verbose=T, quiet=T, clean=T)' \
  && rm -rf /tmp/Rtmp*
 
 COPY . /app

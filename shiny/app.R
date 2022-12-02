@@ -1,4 +1,5 @@
 library(shiny)
+library(shinymaterial)
 library(omixerRpm)
 
 # form fields names 
@@ -31,69 +32,67 @@ loadData <- function(target) {
 }
 
 # Define UI for app that draws a histogram ----
-ui <- fluidPage(
+ui <- material_page(
+  title = "ShinyRpm",
+  primary_theme_color = "#2d3032",
+  secondary_theme_color = "#428bca",
+  tags$br(),
+  material_row(
+    material_column(
+      width = 2,
+      material_card(
+        depth = 1,
+        # Input: Select a file ----
+        fileInput("matrix", "Choose TSV inpule File",
+                  multiple = FALSE,
+                  accept = c("text/tsv",
+                             "text/tab-separated-values,text/plain", ".txt,.tsv")),
+        # Input: dropdown for the database
+        selectInput(inputId = "module.db",
+                    label = "Module database for mapping",
+                    choices = listDB()),
+        # Input: dropdown for the annotation type
+        selectInput(inputId = "annotation",
+                    label = "Input file annotation",
+                    choices = c("1: orthologs only", "2: taxonomic annotation followed by orthologs")),
+        # -c,--coverage                The minimum coverage cut-off to accept a module [0.0 to 1.0].
+        # Defaults to -1, where the coverage is learned from the coverage distribution of all modules
+        sliderInput(inputId = "minimum.coverage",
+                    label = "The minimum pathway coverage to consider a module present",
+                    min = 0,
+                    max = 1,
+                    value = 0.3),
+        # Input: dropdown for the score estimator
+        selectInput(inputId = "score.estimator",
+                    label = "The score estimatore",
+                    choices = c("median", "average", "sum", "min")),
 
-  # App title ----
-  titlePanel("ShinyR-omixer-rpm: A Web App for metabolic module profiling of microbiome samples"),
+        checkboxInput(inputId = "normalize.by.length",
+                      label = "Divide module score by its length",
+                      value = F),
 
-  # Sidebar layout with input and output definitions ----
-  sidebarLayout(
+        checkboxInput(inputId = "distribute",
+                      label = "[Experimental feature] When an ortholog is shared by N modules then its abundance is divided by N.",
+                      value = F),
 
-    # Sidebar panel for inputs ----
-    sidebarPanel(
-
-      # Input: Select a file ----
-      fileInput("matrix", "Choose TSV inpule File",
-                multiple = FALSE,
-                accept = c("text/tsv",
-                           "text/tab-separated-values,text/plain", ".txt,.tsv")),
-
-      # Horizontal line ----
-      tags$hr(),
-
-      # Input: dropdown for the database
-      selectInput(inputId = "module.db",
-                  label = "Database: module database for mapping",
-                  choices = listDB()),
-      # Input: dropdown for the annotation type
-      selectInput(inputId = "annotation",
-                  label = "Input file annotation",
-                  choices = c("1: orthologs only", "2: taxonomic annotation followed by orthologs")),
-      # -c,--coverage                The minimum coverage cut-off to accept a module [0.0 to 1.0].
-      # Defaults to -1, where the coverage is learned from the coverage distribution of all modules
-      sliderInput(inputId = "minimum.coverage",
-                  label = "The minimum pathway coverage to consider a module present",
-                  min = 0,
-                  max = 1,
-                  value = 0.3),
-      # Input: dropdown for the score estimator
-      selectInput(inputId = "score.estimator",
-                  label = "The score estimatore",
-                  choices = c("median", "average", "sum", "min")),
-
-      checkboxInput(inputId = "normalize.by.length",
-                    label = "Divide module score by its length",
-                    value = F),
-
-      checkboxInput(inputId = "distribute",
-                    label = "[Experimental feature] When an ortholog is shared by N modules then its abundance is divided by N.",
-                    value = F),
-
-      actionButton("submit", "Submit")
+        actionButton("submit", "Submit")
+      ),
+      p("Designed by", a( "Omixer Solutions", href = "https://omixer.io/", target="_blank"))
     ),
-
-    # Main panel for displaying outputs
-    mainPanel(
-      fluidRow(
-        h1('Module abundance', downloadButton('abundance.download', '')),
-        DT::dataTableOutput("abundance"), tags$hr()),
-      fluidRow(
-        h1('Module coverage', downloadButton('coverage.download', '')),
+    material_column(
+      width = 9,
+      material_card(
+        depth = 1,
+        h3('Abundance', downloadButton('abundance.download', '')),
+        DT::dataTableOutput("abundance")
+      ),
+      material_card(
+        depth = 1,
+        h3('Coverage', downloadButton('abundance.coverage', '')),
         DT::dataTableOutput("coverage")
       )
     )
-  ),
-  p("Designed by", a( "Omixer Solutions", href = "https://omixer.io/", target="_blank"))
+  )
 )
 
 server <- function(input, output) {
