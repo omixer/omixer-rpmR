@@ -16,3 +16,6 @@ install: build
 testSuite:
 	R CMD BATCH test/TestMain.R
 	grep "^Number of" TestMain.Rout
+
+docker:
+	docker build -t omixer/shinyrpm:0.1 .
