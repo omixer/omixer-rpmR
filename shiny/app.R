@@ -14,16 +14,19 @@ runRpm <- function(input) {
   # run rpm mapping with user input
   modules <- rpm(x = input$matrix$datapath, minimum.coverage = input$minimum.coverage, annotation = annotation, module.db = module.db)
   # collect module names
-  module.names <- apply(data.frame(Module=modules@annotation$Module), 1, function(x) getNames(modules@db, x))
+  module.names <- apply(data.frame(Module = modules@annotation$Module), 1, function(x) getNames(modules@db, x))
   # create a dataframe with modules, names and abundance
-  data <- cbind(modules@annotation, Names=module.names, modules@abundance)
-  response <<- data
+  abundance <<- cbind(modules@annotation, Names = module.names, modules@abundance)
+  # create a dataframe with modules, names and coverage
+  coverage <<- cbind(modules@annotation, Names = module.names, modules@coverage)
 }
 
 # Load the response
-loadData <- function() {
-  if (exists("response")) {
-    response
+loadData <- function(target) {
+  if (target == "abundance" && exists("abundance")) {
+    abundance
+  } else if (target == "coverage" && exists("coverage")) {
+    coverage
   }
 }
 
@@ -43,7 +46,7 @@ ui <- fluidPage(
       fileInput("matrix", "Choose TSV inpule File",
                 multiple = FALSE,
                 accept = c("text/tsv",
-                         "text/tab-separated-values,text/plain", ".txt,.tsv")),
+                           "text/tab-separated-values,text/plain", ".txt,.tsv")),
 
       # Horizontal line ----
       tags$hr(),
@@ -56,8 +59,8 @@ ui <- fluidPage(
       selectInput(inputId = "annotation",
                   label = "Input file annotation",
                   choices = c("1: orthologs only", "2: taxonomic annotation followed by orthologs")),
- # -c,--coverage                The minimum coverage cut-off to accept a module [0.0 to 1.0].
- # Defaults to -1, where the coverage is learned from the coverage distribution of all modules
+      # -c,--coverage                The minimum coverage cut-off to accept a module [0.0 to 1.0].
+      # Defaults to -1, where the coverage is learned from the coverage distribution of all modules
       sliderInput(inputId = "minimum.coverage",
                   label = "The minimum pathway coverage to consider a module present",
                   min = 0,
@@ -69,42 +72,60 @@ ui <- fluidPage(
                   choices = c("median", "average", "sum", "min")),
 
       checkboxInput(inputId = "normalize.by.length",
-                  label = "Divide module score by its length",
-                  value = F),
+                    label = "Divide module score by its length",
+                    value = F),
 
       checkboxInput(inputId = "distribute",
-                  label = "[Experimental feature] When an ortholog is shared by N modules then its abundance is divided by N.",
-                  value = F),
+                    label = "[Experimental feature] When an ortholog is shared by N modules then its abundance is divided by N.",
+                    value = F),
 
       actionButton("submit", "Submit")
     ),
 
     # Main panel for displaying outputs
     mainPanel(
-      DT::dataTableOutput("response"), tags$hr()
+      fluidRow(
+        h1('Module abundance', downloadButton('abundance.download', '')),
+        DT::dataTableOutput("abundance"), tags$hr()),
+      fluidRow(
+        h1('Module coverage', downloadButton('coverage.download', '')),
+        DT::dataTableOutput("coverage")
+      )
     )
   )
 )
 
 server <- function(input, output) {
 
-    # collect user form input
-    formData <- reactive({
-      data <- sapply(fields, function(x) input[[x]])
-      data
-    })
+  # collect user form input
+  formData <- reactive({
+    data <- sapply(fields, function(x) input[[x]])
+    data
+  })
 
-    # run omixer-rpm when the Submit button is clicked
-    observeEvent(input$submit, {
-      runRpm(formData())
-    })
+  # run omixer-rpm when the Submit button is clicked
+  observeEvent(input$submit, {
+    runRpm(formData())
+  })
 
-    # render the response
-    output$response <- DT::renderDataTable({
-      input$submit
-      loadData()
-    })
+  # render the response
+  output$abundance <- DT::renderDataTable({
+    input$submit
+    loadData("abundance")
+  })
 
+  output$coverage <- DT::renderDataTable({
+    input$submit
+    loadData("coverage")
+  })
+
+  output$abundance.download = downloadHandler('modules.abundance.tsv', content = function(file) {
+    write.table(loadData("abundance"), file, row.names = FALSE, sep = "\t", quote = FALSE)
+  })
+
+  output$coverage.download = downloadHandler('modules.coverage.tsv', content = function(file) {
+    write.table(loadData("coverage"), file, row.names = FALSE, sep = "\t", quote = FALSE)
+  })
 }
 
 shinyApp(ui = ui, server = server)
