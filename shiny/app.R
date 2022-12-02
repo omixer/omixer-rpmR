@@ -34,7 +34,7 @@ loadData <- function(target) {
 ui <- fluidPage(
 
   # App title ----
-  titlePanel("ShinyR-omixer-rpm: A Web App for metabolic module profiling of microbiome samples [alpha]"),
+  titlePanel("ShinyR-omixer-rpm: A Web App for metabolic module profiling of microbiome samples"),
 
   # Sidebar layout with input and output definitions ----
   sidebarLayout(
@@ -92,7 +92,8 @@ ui <- fluidPage(
         DT::dataTableOutput("coverage")
       )
     )
-  )
+  ),
+  p("Designed by", a( "Omixer Solutions", href = "https://omixer.io/", target="_blank"))
 )
 
 server <- function(input, output) {
