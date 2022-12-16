@@ -68,3 +68,8 @@ test.moduleDbLoad <- function() {
 	# check getNames returns the correct annotation
 	checkEquals(getNames(db, "MF0010"), "sucrose degradation I")
 }
+
+test.handleMalformedInput <- function() {
+	# expect a NumberFormat exception for the wrong annotation value
+	checkException(rpm("test/species_matrix.tsv", annotation = 1, minimum.coverage = 0.3))
+}
