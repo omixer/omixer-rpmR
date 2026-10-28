@@ -2,10 +2,10 @@
 An R interface to [omixer-rpm](https://github.com/raeslab/omixer-rpm), the tool for metabolic module profiling of microbiome samples
 
 #### Dependencies 
-R and Java8 (Docker users, please make sure Java8 is part of the R image)
+R and Java 17 or newer (Docker users, please make sure Java 17 is part of the R image). The bundled omixer-rpm is version 1.2.
 
 #### Installation
-##### Binaries for Linux only (tested on 16.04.1-Ubuntu) 
+##### Binaries for Linux only (built and tested on Ubuntu 24.04 LTS with R 4.3.3) 
 Download the latest binary (omixeRpm_x.y.z.tar.gz) from [the release page](https://github.com/omixer/omixer-rpmR/releases), then install it as 
 follows after replacing x.y.z by the correct version 
 
@@ -37,6 +37,9 @@ mods &lt;- rpm(dat, minimum.coverage=0.3, annotation = 1)
 
 # alternatively run the mapping without loading the table into R.
 mods &lt;- rpm("matrix.tsv", minimum.coverage=0.3, annotation = 1)
+
+# require every subunit of a complex step (comma-separated KOs) instead of at least one
+mods &lt;- rpm(dat, minimum.coverage=0.3, annotation = 1, complex.rule = "all")
 
 # Load the default mapping database
 db &lt;- loadDefaultDB()
@@ -70,5 +73,5 @@ omixer-rpmR was developed as part of GOmixer. If you use omixer-rpmR in your wor
 Youssef Darzi, Gwen Falony, Sara Silva, Jeroen Raes. [Towards biome-specific analysis of meta-omics data](https://www.nature.com/articles/ismej2015188), The ISME journal, 2015.
 
 #### License
-GNU General Public License v3.0. 
+MIT (the R code of this package), see [LICENSE](LICENSE).
 The bundled omixer-rpm.jar is licensed under an [Academic Non-commercial Software License Agreement](https://github.com/raeslab/omixer-rpm/blob/master/LICENSE)

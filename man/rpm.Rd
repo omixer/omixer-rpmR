@@ -11,7 +11,8 @@ Generates metabolic module profiles from metagenomic samples.
 }
 \usage{
 rpm(x, minimum.coverage = -1, score.estimator = "median", 
-    annotation = 1, module.db = NULL, threads = 1, normalize.by.length = FALSE, distribute = FALSE, java.mem = NULL)
+    annotation = 1, module.db = NULL, threads = 1, normalize.by.length = FALSE, distribute = FALSE, java.mem = NULL,
+    complex.rule = "any")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -50,6 +51,11 @@ Experimental feature - When an ortholog is shared by N modules then its abundanc
   \item{java.mem}{
 The maximum amount of memory (in Gb) to allocate for the underlying omixer-rpm.jar tool. Value is an Integer comprised between 1 and the RAM size.
 } 
+  \item{complex.rule}{
+How a complex step (subunits written K1,K2 in the module database) counts when only some subunits are observed.
+"any" (default): the step is present when at least one subunit is observed, since a missing subunit is more often unsampled than absent.
+"all": the step is present only when every subunit is observed; otherwise it gets no coverage and no abundance.
+}
 
 }
 \details{

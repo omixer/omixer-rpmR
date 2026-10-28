@@ -1,4 +1,4 @@
-OMIXER_RPM_JAR=https://github.com/raeslab/omixer-rpm/releases/download/1.1/omixer-rpm-1.1.jar
+OMIXER_RPM_JAR=https://github.com/raeslab/omixer-rpm/releases/download/v1.2.0/omixer-rpm-1.2-all.jar
 
 build: clean
 	R CMD build .

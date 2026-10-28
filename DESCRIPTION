@@ -1,9 +1,12 @@
 Package: omixerRpm
 Type: Package
 Title: Metabolic module profiling of microbiome samples
-Version: 0.3.3
-Date: 2022-12-16
+Version: 0.4.0
+Date: 2026-10-28
 Author: Youssef Darzi
 Maintainer: Youssef Darzi<youssef.darzi@omixer.io>
-Description: An R interface to the omixer-rpm for metabolic module profiling of microbiome samples
-License: GNU General Public License v3.0. The bundled omixer-rpm.jar is licensed under an Academic Non-commercial Software License Agreement, https://github.com/raeslab/omixer-rpm/blob/master/LICENSE
+Description: An R interface to the omixer-rpm for metabolic module profiling of microbiome samples.
+    The bundled omixer-rpm.jar is licensed under an Academic Non-commercial Software License Agreement,
+    <https://github.com/raeslab/omixer-rpm/blob/master/LICENSE>.
+SystemRequirements: Java (>= 17)
+License: MIT + file LICENSE

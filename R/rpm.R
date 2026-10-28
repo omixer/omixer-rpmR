@@ -1,7 +1,7 @@
 # x is a dataframe or a valid file path
 # Add the Description of modules as a data object
 rpm <- function(x, minimum.coverage = -1, score.estimator = "median", annotation = 1, module.db = NULL, threads = 1,
-                normalize.by.length = FALSE, distribute = FALSE, java.mem = NULL) {
+                normalize.by.length = FALSE, distribute = FALSE, java.mem = NULL, complex.rule = "any") {
   # link to the GMMs executable and DB
   rpm.exec <- system.file("java", "omixer-rpm.jar", package = "omixerRpm")
   if (is.null(module.db)) {
@@ -38,7 +38,8 @@ rpm <- function(x, minimum.coverage = -1, score.estimator = "median", annotation
                    "-o", out.dir,
                    "-a", annotation,
                    "-t", threads,
-                   "-e", 2)
+                   "-e", 2,
+                   "--complex-rule", complex.rule)
   if (normalize.by.length == TRUE) {
     command <- paste(command, "-n")
   }
@@ -65,6 +66,11 @@ rpm <- function(x, minimum.coverage = -1, score.estimator = "median", annotation
       stop(e)
     }
   )
+
+  # omixer-rpm reports input errors in its log but may still exit with status 0
+  if (!file.exists(file.path(out.dir, "modules.tsv"))) {
+    stop("Omixer-RPM did not produce any output. See the error message above.")
+  }
 
   abundance <- read.table(file.path(out.dir, "modules.tsv"), sep = "\t", header = TRUE)
   coverage <- read.table(file.path(out.dir, "modules-coverage.tsv"), sep = "\t", header = TRUE)
