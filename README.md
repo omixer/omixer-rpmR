@@ -2,7 +2,9 @@
 An R interface to [omixer-rpm](https://github.com/raeslab/omixer-rpm), the tool for metabolic module profiling of microbiome samples
 
 #### Dependencies 
-R and Java 17 or newer (Docker users, please make sure Java 17 is part of the R image). The bundled omixer-rpm is version 1.2.
+R and Java 21 or newer (Docker users, please make sure Java 21 is part of the R image). The bundled omixer-rpm is
+version 2.0.0-rc.1, a release candidate: same results as 1.2.1 apart from the bug fixes in its
+[changelog](https://github.com/raeslab/omixer-rpm/blob/master/CHANGELOG.md), and new support for HUMAnN tables.
 
 #### Installation
 ##### Binaries for Linux only (built and tested on Ubuntu 24.04 LTS with R 4.3.3) 
@@ -49,6 +51,25 @@ getNames(db, mods@annotation[1,])
 # get the abundance|coverage as a data.frame with module id and description
 coverage <- asDataFrame(mods, "coverage")
 </pre>
+
+##### HUMAnN input
+`annotation = "humann"` reads a [HUMAnN](https://github.com/biobakery/humann) (3, or 2) gene family table regrouped
+to KEGG KOs, optionally renormalized and joined into one table:
+<pre>
+humann_regroup_table --input S1_genefamilies.tsv --groups uniref90_ko --output S1_ko.tsv
+humann_renorm_table --input S1_ko.tsv --units cpm --output S1_ko_cpm.tsv
+humann_join_tables --input tables/ --output ko.tsv --file_name ko_cpm
+</pre>
+<pre>
+# modules per taxon of each sample, from the stratified rows (KO|taxon, HUMAnN's unclassified included)
+mods &lt;- rpm("ko.tsv", annotation = "humann")
+# modules per sample, from the community total rows (never added to their strata)
+mods &lt;- rpm("ko.tsv", annotation = "humann", ignore.taxonomy = TRUE)
+</pre>
+A table without strata (`humann --remove-stratified-output`) gives one result per sample. Rows such as `UNMAPPED` and
+`UNGROUPED` and KO names added by `humann_rename_table` are ignored, and sample names lose HUMAnN's `_Abundance`
+suffix. Give the table as a file path: `rpm()` refuses a data.frame for HUMAnN input, because `read.table()` treats
+the header line (it starts with `#`) as a comment and turns the first row of data into the header.
 
 
 ##### Using an alternative database, several options are available

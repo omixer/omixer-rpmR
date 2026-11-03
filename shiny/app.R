@@ -10,8 +10,8 @@ runRpm <- function(input) {
 
   # load the selected module database for mapping 
   module.db <- loadDB(input$module.db)
-  # get the annotation value from the first charachter of the input 
-  annotation <- substring(input$annotation, 1, 1)
+  # get the annotation value: the text before the colon (1, 2 or humann)
+  annotation <- sub(":.*", "", input$annotation)
   # run rpm mapping with user input
   modules <- rpm(x = input$matrix$datapath, minimum.coverage = input$minimum.coverage, annotation = annotation, module.db = module.db)
   # collect module names
@@ -54,7 +54,8 @@ ui <- material_page(
         # Input: dropdown for the annotation type
         selectInput(inputId = "annotation",
                     label = "Input file annotation",
-                    choices = c("1: orthologs only", "2: taxonomic annotation followed by orthologs")),
+                    choices = c("1: orthologs only", "2: taxonomic annotation followed by orthologs",
+                                    "humann: HUMAnN KO table (humann_regroup_table, joined)")),
         # -c,--coverage                The minimum coverage cut-off to accept a module [0.0 to 1.0].
         # Defaults to -1, where the coverage is learned from the coverage distribution of all modules
         sliderInput(inputId = "minimum.coverage",

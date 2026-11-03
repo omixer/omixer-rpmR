@@ -1,0 +1,9 @@
+# Gene Family	S1_Abundance-RPKs	S2_Abundance-RPKs
+UNMAPPED	100	200
+UNGROUPED	50	60
+UNGROUPED|g__Bacteroides.s__Bacteroides_fragilis	50	60
+K01051: pectinesterase [EC:3.1.1.11]	6	2
+K01051: pectinesterase [EC:3.1.1.11]|g__Bacteroides.s__Bacteroides_fragilis	4	2
+K01051: pectinesterase [EC:3.1.1.11]|unclassified	2	0
+K18650	3	5
+K18650|g__Bacteroides.s__Bacteroides_fragilis	3	5

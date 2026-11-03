@@ -1,7 +1,8 @@
 # x is a dataframe or a valid file path
 # Add the Description of modules as a data object
 rpm <- function(x, minimum.coverage = -1, score.estimator = "median", annotation = 1, module.db = NULL, threads = 1,
-                normalize.by.length = FALSE, distribute = FALSE, java.mem = NULL, complex.rule = "any") {
+                normalize.by.length = FALSE, distribute = FALSE, java.mem = NULL, complex.rule = "any",
+                ignore.taxonomy = FALSE) {
   # link to the GMMs executable and DB
   rpm.exec <- system.file("java", "omixer-rpm.jar", package = "omixerRpm")
   if (is.null(module.db)) {
@@ -11,6 +12,13 @@ rpm <- function(x, minimum.coverage = -1, score.estimator = "median", annotation
   # Prepare output directories
   out.dir <- tempfile()
   dir.create(out.dir)
+
+  # a HUMAnN table's header starts with #, which read.table() treats as a comment: the first data row then becomes
+  # the header, so samples and values are lost before rpm() sees them. omixer-rpm reads the file itself instead.
+  if (annotation == "humann" && !is.character(x)) {
+    stop("annotation = \"humann\" needs the path of the HUMAnN table, not a data.frame: read.table() drops its ",
+         "header line (it starts with #), so the first row of data would be lost. Pass the file path to rpm().")
+  }
 
   # Is x a file or a data.frame
   if (!is.character(x)) {
@@ -48,6 +56,11 @@ rpm <- function(x, minimum.coverage = -1, score.estimator = "median", annotation
     command <- paste(command, "--Xdistribute")
   }
 
+  # one result per sample instead of per taxon of a sample (annotation 2, or a stratified HUMAnN table)
+  if (ignore.taxonomy == TRUE) {
+    command <- paste(command, "--ignore-taxonomic-info")
+  }
+
   # Run the module mapping
   tryCatch({
     status <- system(command)
@@ -67,7 +80,7 @@ rpm <- function(x, minimum.coverage = -1, score.estimator = "median", annotation
     }
   )
 
-  # omixer-rpm reports input errors in its log but may still exit with status 0
+  # omixer-rpm 2.0 exits with a non-zero status on errors (1.x did not); kept as a safety net
   if (!file.exists(file.path(out.dir, "modules.tsv"))) {
     stop("Omixer-RPM did not produce any output. See the error message above.")
   }
@@ -75,27 +88,12 @@ rpm <- function(x, minimum.coverage = -1, score.estimator = "median", annotation
   abundance <- read.table(file.path(out.dir, "modules.tsv"), sep = "\t", header = TRUE)
   coverage <- read.table(file.path(out.dir, "modules-coverage.tsv"), sep = "\t", header = TRUE)
 
-  annotation.df <- NULL
-
-  if (annotation == 1) {
-    # ortohology only
-    abundance.colnames <- colnames(abundance)
-    annotation.df <- as.data.frame(abundance[, 1])
-    abundance <- as.data.frame(abundance[, -c(1)])
-    coverage <- as.data.frame(coverage[, -c(1)])
-    colnames(annotation.df) <- abundance.colnames[1]
-    colnames(abundance) <- abundance.colnames[2:length(abundance.colnames)]
-    colnames(coverage) <- abundance.colnames[2:length(abundance.colnames)]
-  } else if (annotation == 2) {
-    # orthology and taxonomy
-    abundance.colnames <- colnames(abundance)
-    annotation.df <- as.data.frame(abundance[, c(1, 2)])
-    abundance <- as.data.frame(abundance[, -c(1, 2)])
-    coverage <- as.data.frame(coverage[, -c(1, 2)])
-    colnames(annotation.df) <- abundance.colnames[1:2]
-    colnames(abundance) <- abundance.colnames[3:length(abundance.colnames)]
-    colnames(coverage) <- abundance.colnames[3:length(abundance.colnames)]
-  }
+  # the key columns, from the output itself: Taxon and Module for results per taxon (annotation 2, or a stratified
+  # HUMAnN table without ignore.taxonomy), Module alone otherwise
+  keys <- if (colnames(abundance)[1] == "Taxon") c(1, 2) else 1
+  annotation.df <- abundance[, keys, drop = FALSE]
+  abundance <- abundance[, -keys, drop = FALSE]
+  coverage <- coverage[, -keys, drop = FALSE]
 
   Modules(abundance = abundance, coverage = coverage, annotation = annotation.df, db = module.db)
 }

@@ -12,13 +12,14 @@ Generates metabolic module profiles from metagenomic samples.
 \usage{
 rpm(x, minimum.coverage = -1, score.estimator = "median", 
     annotation = 1, module.db = NULL, threads = 1, normalize.by.length = FALSE, distribute = FALSE, java.mem = NULL,
-    complex.rule = "any")
+    complex.rule = "any", ignore.taxonomy = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{
 A data.frame or a file path containing functional profiles with KEGG KO annotation. Taxonomic annotation could be included as well.
-See annotation for more info on the formating
+See annotation for more info on the formating. A HUMAnN table (annotation "humann") must be given as a file path:
+its header starts with #, which \code{read.table()} drops, so a data.frame is refused.
 }
   \item{minimum.coverage}{
 The minimum pathway coverage to consider a module present.
@@ -30,6 +31,11 @@ One of [median|average|sum|min] to estimate the abundance of the module. Default
 }
   \item{annotation}{
 Data annotation. Use 1 for KEGG KO annotation only or 2 for taxonomic followed by KO annotation.
+Use "humann" for a HUMAnN gene family table regrouped to KOs (humann_regroup_table --groups uniref90_ko), optionally
+renormalized and joined into one table (humann_join_tables): results are per taxon from its stratified rows
+(KO|taxon, unclassified included), or per sample from its community totals with \code{ignore.taxonomy = TRUE};
+a table without strata gives results per sample. Rows such as UNMAPPED and UNGROUPED and KO names are ignored, and
+sample names lose HUMAnN's _Abundance suffix.
 }
   \item{module.db}{
 A ModuleDB object to locate the database files. If omitted the GMMS database from Vieira-Silva, et al 2016 Nat Microbiol (doi:10.1038/nmicrobiol.2016.88)
@@ -55,6 +61,10 @@ The maximum amount of memory (in Gb) to allocate for the underlying omixer-rpm.j
 How a complex step (subunits written K1,K2 in the module database) counts when only some subunits are observed.
 "any" (default): the step is present when at least one subunit is observed, since a missing subunit is more often unsampled than absent.
 "all": the step is present only when every subunit is observed; otherwise it gets no coverage and no abundance.
+}
+  \item{ignore.taxonomy}{
+For taxon-annotated input (annotation 2, or a stratified HUMAnN table), infer the modules of each whole sample
+instead of each taxon of a sample. For HUMAnN tables, the community total rows are used (never added to their strata).
 }
 
 }
@@ -96,6 +106,9 @@ mods <- rpm("matrix.tsv", minimum.coverage=0.3, annotation = 1)
 db <- loadDefaultDB()
 # get the name of the first predicted module
 getNames(db, mods@annotation[1,]) 
+# a HUMAnN KO table: per taxon, or per sample with ignore.taxonomy
+mods <- rpm("ko.tsv", annotation = "humann")
+mods <- rpm("ko.tsv", annotation = "humann", ignore.taxonomy = TRUE)
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
