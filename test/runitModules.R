@@ -18,7 +18,7 @@ test.moduleMapping <- function (){
 	checkEquals(ncol(taxon.mods@coverage), 2)
 }
 
-test.callOptions <- {
+test.callOptions <- function() {
 	# check default
 	mods <- rpm("test/matrix.tsv", annotation = 1, minimum.coverage=0.66)
 	checkEquals(mods@abundance[which(mods@annotation == 'MF0004'), "S1"], 5457.398359)
@@ -32,37 +32,50 @@ test.callOptions <- {
 	checkEquals(mods@abundance[which(mods@annotation == 'MF0004'), "S1"], 236.1969061)
 }
 
-# See code comments
 test.moduleDbAnnotation <- function() {
 	# Setup the default module database.
 	db <- loadDefaultDB()
 	# check getNames returns the correct annotation
 	checkEquals(getNames(db, "MF0010"), "sucrose degradation I")
+	# several modules at once; NA for an unknown module
+	checkEquals(getNames(db, c("MF0010", "unknown", "MF0001")), c("sucrose degradation I", NA, "arabinoxylan degradation"))
+	# a database made with ModuleDB() reads the names from its file
+	db <- ModuleDB(directory = system.file("extdata", package = "omixerRpm"), modules = "GMMs.v1.07.txt",
+	               module.names.file = "GMMs.v1.07.names")
+	checkEquals(getNames(db, "MF0010"), "sucrose degradation I")
 }
 
 
-test.asDataFrame <- {
+test.asDataFrame <- function() {
 	# check default
 	mods <- rpm("test/matrix.tsv", annotation = 1, minimum.coverage=0.3)
 	coverage <- asDataFrame(mods, "coverage")
-	print(coverage)
 	checkEquals(nrow(coverage), 96)
 	checkEquals(ncol(coverage), 4)
 	# modules follow the database order
 	checkEquals(as.character(coverage[1, "Description"]), "arabinoxylan degradation")
 	checkEquals(as.character(coverage[96, "Description"]), "mucin degradation")
+	checkEquals(colnames(coverage), c("Module", "Description", "S1", "S2"))
+
+	# per taxon: the Taxon and Module columns are kept
+	coverage <- asDataFrame(rpm("test/species_matrix.tsv", annotation = 2, minimum.coverage = 0.3), "coverage")
+	checkEquals(colnames(coverage)[1:3], c("Taxon", "Module", "Description"))
+
+	# a database made with ModuleDB(): same table
+	db <- ModuleDB(directory = system.file("extdata", package = "omixerRpm"), modules = "GMMs.v1.07.txt",
+	               module.names.file = "GMMs.v1.07.names")
+	checkEquals(asDataFrame(rpm("test/matrix.tsv", minimum.coverage = 0.3, module.db = db), "coverage"),
+	            asDataFrame(mods, "coverage"))
 }
 
 
 test.moduleDbList <- function() {
 	# List available databases.
 	db <- listDB()
-	# check getNames returns the correct annotation
 	checkEquals(db[1], "GBMs.v1.0")
 	checkEquals(db[2], "GMMs.v1.07")
 }
 
-# See code comments
 test.moduleDbLoad <- function() {
 	# Setup the default module database.
 	db <- loadDB("GMMs.v1.07")
@@ -71,7 +84,7 @@ test.moduleDbLoad <- function() {
 }
 
 test.handleMalformedInput <- function() {
-	# expect a NumberFormat exception for the wrong annotation value
+	# a taxon matrix given as annotation 1
 	checkException(rpm("test/species_matrix.tsv", annotation = 1, minimum.coverage = 0.3))
 }
 
@@ -139,4 +152,34 @@ test.ignoreTaxonomy <- function() {
 	checkEquals(colnames(mods@annotation), "Module")
 	checkEquals(anyDuplicated(mods@annotation$Module), 0)
 	checkEquals(ncol(mods@abundance), 2)
+}
+
+# a failed run stops with omixer-rpm's own message
+test.errorMessage <- function() {
+	message <- tryCatch(rpm("test/species_matrix.tsv", annotation = 1, minimum.coverage = 0.3),
+	                    error = conditionMessage)
+	checkTrue(grepl("species_matrix.tsv, line 2: ", message, fixed = TRUE))
+	checkTrue(grepl("is not KO<TAB>one abundance per sample", message, fixed = TRUE))
+	checkTrue(!grepl("ERROR - ", message, fixed = TRUE))
+
+	# a command line error
+	message <- tryCatch(rpm("test/matrix.tsv", annotation = 1, minimum.coverage = 0.3, complex.rule = "fraction"),
+	                    error = conditionMessage)
+	checkTrue(grepl("fraction", message, fixed = TRUE))
+}
+
+test.pathWithSpaces <- function() {
+	dir <- file.path(tempfile(), "a folder")
+	dir.create(dir, recursive = TRUE)
+	file.copy("test/matrix.tsv", file.path(dir, "my matrix.tsv"))
+	mods <- rpm(file.path(dir, "my matrix.tsv"), annotation = 1, minimum.coverage = 0.66)
+	checkEquals(mods@abundance[which(mods@annotation == 'MF0004'), "S1"], 5457.398359)
+}
+
+test.javaNotFound <- function() {
+	path <- Sys.getenv("PATH")
+	on.exit(Sys.setenv(PATH = path))
+	Sys.setenv(PATH = tempdir())
+	message <- tryCatch(rpm("test/matrix.tsv", annotation = 1), error = conditionMessage)
+	checkTrue(grepl("Java was not found", message, fixed = TRUE))
 }

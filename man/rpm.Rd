@@ -1,12 +1,9 @@
 \name{rpm}
 \alias{rpm}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
 Metabolic module profiling for gut microbiome samples
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
 Generates metabolic module profiles from metagenomic samples.
 }
 \usage{
@@ -14,7 +11,6 @@ rpm(x, minimum.coverage = -1, score.estimator = "median",
     annotation = 1, module.db = NULL, threads = 1, normalize.by.length = FALSE, distribute = FALSE, java.mem = NULL,
     complex.rule = "any", ignore.taxonomy = FALSE)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{
 A data.frame or a file path containing functional profiles with KEGG KO annotation. Taxonomic annotation could be included as well.
@@ -68,31 +64,16 @@ instead of each taxon of a sample. For HUMAnN tables, the community total rows a
 }
 
 }
-\details{
-%%  ~~ If necessary, more details than the description above ~~
-}
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-}
-\references{
-%% ~put references to the literature/web site here ~
+A \code{Modules} object: the abundance and coverage of the modules (rows) per sample (columns), their key columns
+(Module, or Taxon and Module for results per taxon) and the module database. \code{asDataFrame} turns it into one
+table with the module descriptions.
 }
 \author{
-%%  ~~who you are~~
 Youssef Darzi
 }
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+\code{\link{asDataFrame}}, \code{\link{loadDB}}, \code{\link{runShinyRpm}}
 }
 \examples{
 \dontrun{
@@ -111,7 +92,3 @@ mods <- rpm("ko.tsv", annotation = "humann")
 mods <- rpm("ko.tsv", annotation = "humann", ignore.taxonomy = TRUE)
 }
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }% use one of  RShowDoc("KEYWORDS")
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line

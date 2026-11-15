@@ -7,13 +7,6 @@ if (is.null(getOption("shiny.maxRequestSize"))) {
   options(shiny.maxRequestSize = 1024^3)
 }
 
-# a result table: the key columns (Taxon,) Module, the module name, then one column per sample
-moduleTable <- function(modules, values) {
-  names <- vapply(modules@annotation$Module, function(m) as.character(getNames(modules@db, m)), character(1),
-                  USE.NAMES = FALSE)
-  cbind(modules@annotation, Name = names, values)
-}
-
 resultPanel <- function(title, id) {
   nav_panel(
     title,
@@ -80,8 +73,7 @@ server <- function(input, output, session) {
       }
     )
     if (!is.null(modules)) {
-      results(list(abundance = moduleTable(modules, modules@abundance),
-                   coverage = moduleTable(modules, modules@coverage)))
+      results(list(abundance = asDataFrame(modules, "abundance"), coverage = asDataFrame(modules, "coverage")))
     }
   })
 

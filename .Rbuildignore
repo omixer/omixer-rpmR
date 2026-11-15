@@ -8,3 +8,5 @@ Makefile
 SUGGESTIONS\.md
 ^Dockerfile$
 ^\.dockerignore$
+^\.claude$
+^\.idea$

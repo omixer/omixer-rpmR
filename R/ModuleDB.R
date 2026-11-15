@@ -18,17 +18,23 @@ ModuleDB <- setClass(
 				modules = "module.list",
 				hierarchy.file = "hierarchy.tsv",
 				module.names.file = "module.names"
-                ),
-
-        # Make a function that can test to see if the data is consistent.
-        # This is not called if you have an initialize function defined!
-        validity = function(object) {
-			# Could validate by checking files exist
-                return(TRUE)
-        }
+                )
 )
 
-# create a method to get the name fo a given module
+# a tab-separated file of the database: the module id (row names), then its values
+.readDbTable <- function(theObject, file) {
+	read.table(file.path(theObject@directory, file), row.names = 1, sep = "\t", header = FALSE, as.is = TRUE)
+}
+
+# the module names: loaded by loadDB(), read from their file for a database made with ModuleDB()
+.moduleNames <- function(theObject) {
+	if (nrow(theObject@module.names) == 0) {
+		return(.readDbTable(theObject, theObject@module.names.file))
+	}
+	theObject@module.names
+}
+
+# the names of the given modules, NA for a module without name
 setGeneric(name="getNames",
 		def=function(theObject, x){
 			standardGeneric("getNames")
@@ -38,23 +44,13 @@ setGeneric(name="getNames",
 setMethod(f = "getNames",
 		signature = "ModuleDB",
 		definition = function(theObject, x) {
-			if(nrow(theObject@module.names) == 0) {
-				theObject@module.names <- read.table(
-						file.path(theObject@directory, theObject@module.names.file),
-						row.names=1,
-						sep="\t",
-						header=F, 
-						as.is=T)
-			}
-			idx <- which(rownames(theObject@module.names) == x)
-			if(length(idx) > 0 ){
-				return(theObject@module.names[idx,1])
-			}
-			return(NA)
+			names <- .moduleNames(theObject)
+			names[match(as.character(x), rownames(names)), 1]
 		}
 )
 
 
+# the given level of the hierarchy of the given modules, NA for a module without hierarchy
 setGeneric(name="getHierarchy",
 		def=function(theObject, x, level){
 			standardGeneric("getHierarchy")
@@ -64,18 +60,10 @@ setGeneric(name="getHierarchy",
 setMethod(f="getHierarchy",
 		signature="ModuleDB",
 		definition=function(theObject, x, level){
-			if(nrow(theObject@hierarchy) == 0) {
-				theObject@hierarchy <- read.table(
-						file.path(theObject@directory, theObject@hierarchy.file),
-						row.names=1,
-						sep="\t",
-						header=F, 
-						as.is=T)
+			hierarchy <- theObject@hierarchy
+			if (nrow(hierarchy) == 0) {
+				hierarchy <- .readDbTable(theObject, theObject@hierarchy.file)
 			}
-			idx <- which(rownames(theObject@hierarchy) == x)
-			if(length(idx) > 0 ){
-				return(theObject@hierarchy[idx, level])	
-			}
-			return(NA)
+			hierarchy[match(as.character(x), rownames(hierarchy)), level]
 		}
 )

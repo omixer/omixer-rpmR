@@ -13,8 +13,9 @@
 The DESCRIPTION file:
 \packageDESCRIPTION{omixerRpm}
 \packageIndices{omixerRpm}
-~~ An overview of how to use the package, including the most important ~~
-~~ functions ~~
+\code{\link{rpm}} turns KEGG KO profiles (with or without taxa, or HUMAnN KO tables) into module abundance and
+coverage, with a bundled or own module database (\code{\link{loadDB}}); \code{\link{asDataFrame}} gives the result as
+a table. \code{\link{runShinyRpm}} starts a web interface.
 
 }
 \author{
@@ -23,7 +24,6 @@ The DESCRIPTION file:
 Maintainer: \packageMaintainer{omixerRpm}
 }
 \references{
-~~ Literature or other references for background information ~~
 omixerRpm was developed as part of GOmixer. If you use omixerRpm in your work please cite: 
 
 Darzi, et al. Towards biome-specific analysis of meta-omics data, The ISME journal, 2015. http://www.nature.com/articles/ismej2015188
@@ -33,10 +33,6 @@ of the human gut microbiome, Nature Microbiology, 2016 .http://www.nature.com/ar
 
 }
 \keyword{ package , microbiome, gut, metagenomics, metabolic pathways }
-\seealso{
-~~ Optional links to other man pages, e.g. ~~
-~~ \code{\link[<pkg>:<pkg>-package]{<pkg>}} ~~
-}
 \examples{
 \dontrun{
 # read a functional profile matrix into R or create it inside R. Please note that row.names should not be used while reading the matrix. 

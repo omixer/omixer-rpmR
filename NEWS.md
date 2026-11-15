@@ -1,5 +1,21 @@
 # omixerRpm (development version)
 
+## Fixes
+
+- When omixer-rpm fails, the R error now holds its message (e.g. `species_matrix.tsv, line 2: ... is not
+  KO<TAB>one abundance per sample`) instead of "non-zero exit status, refer to the exception output". omixer-rpm's
+  output is now shown once the run has finished, not while it runs.
+- Paths with spaces work (Java is called with `system2()` and one argument per option).
+- A clear error when Java is not found, or is older than 21.
+- `.claude` and `.idea` folders are no longer bundled into the source package.
+- `asDataFrame()` on results per taxon kept the Taxon column but named the Module column "Description"; with a
+  database made with `ModuleDB()`, the sample columns were shifted under the wrong names. Both give the key columns,
+  Description, then the samples now.
+- `getNames()` accepts several modules (NA for an unknown one); it gave one NA and a warning before.
+- `rpm()` removes its temporary files.
+- `loadDB()` reports the loaded database with `message()` (can be silenced with `suppressMessages()`), not `print()`.
+- Explicit NAMESPACE exports; help pages for every exported function; `R CMD check` gives no warnings.
+
 ## Web interface
 
 - `runShinyRpm()` starts the Shiny app from R. It needs shiny, bslib and DT (suggested packages, not installed with

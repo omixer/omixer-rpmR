@@ -9,6 +9,7 @@ Description: An R interface to the omixer-rpm for metabolic module profiling of 
     from KEGG KO profiles (with or without taxa) or HUMAnN KO tables.
     The bundled omixer-rpm.jar is licensed under an Academic Non-commercial Software License Agreement,
     <https://github.com/raeslab/omixer-rpm/blob/master/LICENSE>.
+Imports: methods, utils
 SystemRequirements: Java (>= 21)
 Suggests: shiny, bslib (>= 0.7.0), DT
 License: MIT + file LICENSE

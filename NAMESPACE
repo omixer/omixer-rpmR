@@ -1,1 +1,5 @@
-exportPattern("^[[:alpha:]]+")
+export(rpm, runShinyRpm, listDB, loadDB, loadDefaultDB, ModuleDB, Modules, getNames, getHierarchy, asDataFrame)
+exportClasses(ModuleDB, Modules)
+exportMethods(getNames, getHierarchy, asDataFrame)
+import(methods)
+importFrom(utils, read.table, write.table)

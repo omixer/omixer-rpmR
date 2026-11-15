@@ -18,8 +18,7 @@ Modules <- setClass(
 				db = NULL
                 ),
 
-        # Make a function that can test to see if the data is consistent.
-        # This is not called if you have an initialize function defined!
+        # abundance and coverage hold the same modules and samples
         validity = function(object) {
                 if(!is.null(object@coverage) && !is.null(object@abundance)) {
                     if(!all(dim(object@coverage) == dim(object@abundance))){
@@ -40,11 +39,8 @@ setGeneric(name="asDataFrame",
 setMethod(f = "asDataFrame",
 		signature = "Modules",
 		definition = function(theObject, type) {
-			
-			# create table with module_id, module_description, modules abundances
-			the.data.frame <- cbind(theObject@annotation, theObject@db@module.names[as.character(theObject@annotation$Module), ], slot(theObject, type))
-			# update colnames
-			colnames(the.data.frame)[2] <- "Description"
-			return(the.data.frame)
+			# the key columns ((Taxon,) Module), the module description, then one column per sample
+			cbind(theObject@annotation, Description = getNames(theObject@db, theObject@annotation$Module),
+			      slot(theObject, type))
 		}
 )
