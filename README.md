@@ -40,8 +40,8 @@ then open the browser at http://localhost:3838/rpm/
 Download the example [matrix.tsv](https://github.com/omixer/omixer-rpmR/blob/main/tests/data/matrix.tsv) ([raw link](https://raw.githubusercontent.com/omixer/omixer-rpmR/main/tests/data/matrix.tsv)) from the test [data](https://github.com/omixer/omixer-rpmR/tree/main/tests/data).
 
 <pre>library(omixerRpm)
-# read a functional profile matrix into R or create it inside R. Please note that row.names should not be used while reading the matrix. 
-dat &lt;- read.table("matrix.tsv", header=T, sep="\t")
+# read a functional profile matrix into R or create it inside R. Please note that row.names should not be used while reading the matrix, and that check.names = FALSE keeps the sample names as they are.
+dat &lt;- read.table("matrix.tsv", header=T, sep="\t", check.names=FALSE)
 # Run the module mapping on the loaded table.
 mods &lt;- rpm(dat, minimum.coverage=0.3, annotation = 1)
 

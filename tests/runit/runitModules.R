@@ -178,6 +178,21 @@ test.cutoff <- function() {
   checkTrue(is.na(rpm(data.frame(entry = "K99999", S1 = 1))@cutoff))
 }
 
+# sample names come back as in the input, also when they are not valid R names
+test.sampleNames <- function() {
+  input <- read.table("data/matrix.tsv", header = TRUE, sep = "\t", check.names = FALSE)
+  colnames(input) <- c("entry", "S-1", "1A")
+  file <- tempfile(fileext = ".tsv")
+  write.table(input, file, sep = "\t", quote = FALSE, row.names = FALSE)
+  mods <- rpm(file, minimum.coverage = 0.66)
+  checkEquals(colnames(mods@abundance), c("S-1", "1A"))
+  checkEquals(colnames(mods@coverage), c("S-1", "1A"))
+  checkEquals(mods@abundance[which(mods@annotation == "MF0004"), "S-1"], 5457.398359)
+  checkEquals(colnames(asDataFrame(mods, "abundance")), c("Module", "Description", "S-1", "1A"))
+  # a data.frame with such names
+  checkEquals(colnames(rpm(input, minimum.coverage = 0.66)@abundance), c("S-1", "1A"))
+}
+
 # a failed run stops with omixer-rpm's own message
 test.errorMessage <- function() {
   message <- tryCatch(rpm("data/species_matrix.tsv", annotation = 1, minimum.coverage = 0.3),

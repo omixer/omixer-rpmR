@@ -48,8 +48,8 @@
 #' @examples
 #' \dontrun{
 #' # read a functional profile matrix into R or create it inside R. Please note that row.names should not be used
-#' # while reading the matrix.
-#' dat <- read.table("matrix.tsv", header = TRUE, sep = "\t")
+#' # while reading the matrix, and that check.names = FALSE keeps the sample names as they are.
+#' dat <- read.table("matrix.tsv", header = TRUE, sep = "\t", check.names = FALSE)
 #' # Run the module mapping on the loaded table.
 #' mods <- rpm(dat, minimum.coverage = 0.3, annotation = 1)
 #' # alternatively run the mapping without loading the table into R.
@@ -134,8 +134,9 @@ rpm <- function(x, minimum.coverage = -1, score.estimator = "median", annotation
     stop(.runError(log, status), call. = FALSE)
   }
 
-  abundance <- read.table(file.path(out.dir, "modules.tsv"), sep = "\t", header = TRUE)
-  coverage <- read.table(file.path(out.dir, "modules-coverage.tsv"), sep = "\t", header = TRUE)
+  # check.names = FALSE: the sample names as in the input (read.table() would turn S-1 into S.1 and 1A into X1A)
+  abundance <- read.table(file.path(out.dir, "modules.tsv"), sep = "\t", header = TRUE, check.names = FALSE)
+  coverage <- read.table(file.path(out.dir, "modules-coverage.tsv"), sep = "\t", header = TRUE, check.names = FALSE)
 
   # the key columns, from the output itself: Taxon and Module for results per taxon (annotation 2, or a stratified
   # HUMAnN table without ignore.taxonomy), Module alone otherwise

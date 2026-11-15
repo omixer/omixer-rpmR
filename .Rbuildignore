@@ -9,3 +9,4 @@ SUGGESTIONS\.md
 ^\.dockerignore$
 ^\.claude$
 ^\.idea$
+^TODO\.md$

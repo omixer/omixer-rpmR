@@ -1,5 +1,12 @@
 # omixerRpm (development version)
 
+## Changes
+
+- **Sample names are kept as in the input.** `rpm()` read omixer-rpm's output with `read.table()`'s defaults, which
+  rewrite names that are not valid R names: `S-1` became `S.1`, `1A` became `X1A`, `my sample` became `my.sample`.
+  Valid names (`S1`, `s06a`) are unchanged. Scripts that used the rewritten names need the original ones now. The
+  values are unchanged. When reading your own table into R, use `read.table(..., check.names = FALSE)` too.
+
 ## Fixes
 
 - When omixer-rpm fails, the R error now holds its message (e.g. `species_matrix.tsv, line 2: ... is not

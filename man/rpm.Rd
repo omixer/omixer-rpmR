@@ -82,8 +82,8 @@ points to a Java installation, and otherwise \code{java} from the \code{PATH}. S
 \examples{
 \dontrun{
 # read a functional profile matrix into R or create it inside R. Please note that row.names should not be used
-# while reading the matrix.
-dat <- read.table("matrix.tsv", header = TRUE, sep = "\t")
+# while reading the matrix, and that check.names = FALSE keeps the sample names as they are.
+dat <- read.table("matrix.tsv", header = TRUE, sep = "\t", check.names = FALSE)
 # Run the module mapping on the loaded table.
 mods <- rpm(dat, minimum.coverage = 0.3, annotation = 1)
 # alternatively run the mapping without loading the table into R.
