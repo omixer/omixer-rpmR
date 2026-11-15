@@ -18,13 +18,20 @@ Download the latest source from [the release page](https://github.com/omixer/omi
 
 <code>R CMD INSTALL omixer-rpmR-x.y.z.tar.gz</code>
 
-##### Docker Shiny [experimental]
-Start the docker container 
-```bash
-docker run --rm -ti -p 3838:3838 -v $PWD:/workspace omixer/shinyrpm:0.1
-```
+#### Web interface (Shiny)
+Upload a KO table, choose the database and the options of `rpm()`, then browse and download the module abundance and
+coverage tables. The app needs the packages shiny, bslib and DT, which are not installed with omixerRpm:
+<pre>
+install.packages(c("shiny", "bslib", "DT"))
+omixerRpm::runShinyRpm()
+</pre>
 
-then  open the browser at http://localhost:3838/sample-apps/rpm/
+Or with Docker, from this directory:
+```bash
+make docker
+docker run --rm -p 3838:3838 omixer/shinyrpm:0.6.0
+```
+then open the browser at http://localhost:3838/rpm/
 
 #### Usage
 

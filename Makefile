@@ -18,4 +18,4 @@ testSuite:
 	grep "^Number of" TestMain.Rout
 
 docker:
-	docker build -t omixer/shinyrpm:0.1 .
+	docker build -t omixer/shinyrpm:$(shell sed -n "s/^Version: //p" DESCRIPTION) .

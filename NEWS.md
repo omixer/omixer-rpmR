@@ -1,3 +1,14 @@
+# omixerRpm (development version)
+
+## Web interface
+
+- `runShinyRpm()` starts the Shiny app from R. It needs shiny, bslib and DT (suggested packages, not installed with
+  omixerRpm).
+- The app was rewritten: it passes every option to `rpm()` (the estimator, length normalization and `distribute`
+  were ignored before), offers the automatic coverage cutoff, `complex.rule` and `ignore.taxonomy`, keeps each
+  user's results separate, shows omixer-rpm errors, accepts uploads up to 1 GB, and both downloads work.
+- The Docker image uses R 4.6.1 and serves the app at `/rpm/`.
+
 # omixerRpm 0.6.0 (2026-11-03)
 
 Bundles **omixer-rpm 2.0.0-rc.1**, a release candidate of omixer-rpm 2.0.

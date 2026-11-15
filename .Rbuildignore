@@ -6,3 +6,5 @@ README\.md
 CONTRIBUTING.md
 Makefile
 SUGGESTIONS\.md
+^Dockerfile$
+^\.dockerignore$

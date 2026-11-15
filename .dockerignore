@@ -1,0 +1,5 @@
+.git
+.claude
+.idea
+*.tar.gz
+*.Rcheck
