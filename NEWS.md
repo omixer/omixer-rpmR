@@ -7,6 +7,8 @@
   output is now shown once the run has finished, not while it runs.
 - Paths with spaces work (Java is called with `system2()` and one argument per option).
 - A clear error when Java is not found, or is older than 21.
+- `rpm()` uses `JAVA_HOME/bin/java` when `JAVA_HOME` is set (as Gradle and Maven do), and `java` from the `PATH`
+  otherwise.
 - `.claude` and `.idea` folders are no longer bundled into the source package.
 - `asDataFrame()` on results per taxon kept the Taxon column but named the Module column "Description"; with a
   database made with `ModuleDB()`, the sample columns were shifted under the wrong names. Both give the key columns,
@@ -16,6 +18,8 @@
 - `loadDB()` reports the loaded database with `message()` (can be silenced with `suppressMessages()`), not `print()`.
 - Explicit NAMESPACE exports; help pages for every exported function; `R CMD check` gives no warnings.
 - The tests moved to `tests/` (data in `tests/data`) and run in `R CMD check`; `make testSuite` runs them too.
+- The documentation is written as roxygen comments next to the code; `man/` and `NAMESPACE` are generated from them
+  (`make doc`). All R code follows the tidyverse style (`make style`).
 
 ## Web interface
 

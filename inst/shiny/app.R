@@ -21,9 +21,12 @@ ui <- page_sidebar(
     width = 340,
     fileInput("input_file", "Input table (TSV)", accept = c(".tsv", ".txt", "text/tab-separated-values")),
     selectInput("annotation", "Input format",
-                choices = c("Orthologs only" = "1",
-                            "Taxon, then orthologs" = "2",
-                            "HUMAnN KO table (humann_regroup_table, joined)" = "humann")),
+      choices = c(
+        "Orthologs only" = "1",
+        "Taxon, then orthologs" = "2",
+        "HUMAnN KO table (humann_regroup_table, joined)" = "humann"
+      )
+    ),
     checkboxInput("ignore_taxonomy", "One result per sample (ignore taxa)", FALSE),
     selectInput("module_db", "Module database", choices = listDB(), selected = "GMMs.v1.07"),
     checkboxInput("automatic_coverage", "Learn the coverage cutoff from the data", TRUE),
@@ -33,8 +36,11 @@ ui <- page_sidebar(
     ),
     selectInput("score_estimator", "Score estimator", choices = c("median", "average", "sum", "min")),
     selectInput("complex_rule", "Complex steps",
-                choices = c("Present when any subunit is observed" = "any",
-                            "Present when all subunits are observed" = "all")),
+      choices = c(
+        "Present when any subunit is observed" = "any",
+        "Present when all subunits are observed" = "all"
+      )
+    ),
     checkboxInput("normalize_by_length", "Divide module score by its length", FALSE),
     checkboxInput("distribute", "Divide a shared ortholog's abundance over its modules (experimental)", FALSE),
     input_task_button("run", "Run"),
@@ -47,7 +53,6 @@ ui <- page_sidebar(
 )
 
 server <- function(input, output, session) {
-
   # this session's tables, NULL until a run succeeds
   results <- reactiveVal(NULL)
 
@@ -58,15 +63,17 @@ server <- function(input, output, session) {
       return()
     }
     modules <- tryCatch(
-      rpm(x = input$input_file$datapath,
-          minimum.coverage = if (input$automatic_coverage) -1 else input$minimum_coverage,
-          score.estimator = input$score_estimator,
-          annotation = input$annotation,
-          module.db = loadDB(input$module_db),
-          normalize.by.length = input$normalize_by_length,
-          distribute = input$distribute,
-          complex.rule = input$complex_rule,
-          ignore.taxonomy = input$ignore_taxonomy),
+      rpm(
+        x = input$input_file$datapath,
+        minimum.coverage = if (input$automatic_coverage) -1 else input$minimum_coverage,
+        score.estimator = input$score_estimator,
+        annotation = input$annotation,
+        module.db = loadDB(input$module_db),
+        normalize.by.length = input$normalize_by_length,
+        distribute = input$distribute,
+        complex.rule = input$complex_rule,
+        ignore.taxonomy = input$ignore_taxonomy
+      ),
       error = function(e) {
         showNotification(conditionMessage(e), type = "error", duration = NULL)
         NULL

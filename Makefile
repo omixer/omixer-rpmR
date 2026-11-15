@@ -13,6 +13,14 @@ clean:
 install: build
 	sudo R CMD INSTALL --byte-compile omixerRpm_*.tar.gz
 
+# man/ and NAMESPACE, from the roxygen comments in R/ (needs roxygen2)
+doc:
+	Rscript -e 'roxygen2::roxygenise()'
+
+# the tidyverse style for all R code (needs styler)
+style:
+	Rscript -e 'for (d in c("R", "tests", "inst/shiny")) styler::style_dir(d, recursive = TRUE, include_roxygen_examples = TRUE)'
+
 # the tests of the installed package; R CMD check runs them too
 testSuite:
 	cd tests && Rscript runTests.R

@@ -1,3 +1,5 @@
+#' @rdname loadDB
+#' @export
 loadDefaultDB <- function() {
-	loadDB("GMMs.v1.07")
+  loadDB("GMMs.v1.07")
 }

@@ -3,8 +3,10 @@
 library(RUnit)
 library(omixerRpm)
 
-suite <- defineTestSuite("omixerRpm", dirs = file.path(getwd(), "runit"), testFileRegexp = "^runit.+\\.R$",
-                         rngKind = RNGkind()[1], rngNormalKind = RNGkind()[2])
+suite <- defineTestSuite("omixerRpm",
+  dirs = file.path(getwd(), "runit"), testFileRegexp = "^runit.+\\.R$",
+  rngKind = RNGkind()[1], rngNormalKind = RNGkind()[2]
+)
 result <- runTestSuite(suite)
 printTextProtocol(result, showDetails = FALSE)
 

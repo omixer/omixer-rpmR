@@ -2,7 +2,8 @@
 An R interface to [omixer-rpm](https://github.com/raeslab/omixer-rpm), the tool for metabolic module profiling of microbiome samples
 
 #### Dependencies 
-R and Java 21 or newer (Docker users, please make sure Java 21 is part of the R image). The bundled omixer-rpm is
+R and Java 21 or newer (Docker users, please make sure Java 21 is part of the R image). `rpm()` uses the Java in
+`JAVA_HOME` when it is set, and otherwise `java` from the `PATH`. The bundled omixer-rpm is
 version 2.0.0-rc.1, a release candidate: same results as 1.2.1 apart from the bug fixes in its
 [changelog](https://github.com/raeslab/omixer-rpm/blob/master/CHANGELOG.md), and new support for HUMAnN tables.
 

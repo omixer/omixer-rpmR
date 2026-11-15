@@ -13,3 +13,6 @@ Imports: methods, utils
 SystemRequirements: Java (>= 21)
 Suggests: RUnit, shiny, bslib (>= 0.7.0), DT
 License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+Config/roxygen2/version: 8.1.1
