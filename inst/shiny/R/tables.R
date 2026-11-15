@@ -71,3 +71,26 @@ taxonShares <- function(abundance, module, top = 8) {
   shares <- sweep(values, 2, ifelse(sums > 0, sums, 1), "/")
   list(abundance = values, shares = shares)
 }
+
+# the links between the `taxa` taxa and `modules` modules with the highest abundance in a per-taxon table: a module's
+# abundance in a taxon, in one sample or summed over all samples (sample = ""). Highest first; with the share of the
+# table's total abundance they hold.
+chordLinks <- function(abundance, sample = "", taxa = 15, modules = 15) {
+  samples <- if (nzchar(sample)) sample else sampleColumns(abundance)
+  value <- rowSums(as.matrix(abundance[samples]))
+  links <- data.frame(taxon = abundance$Taxon, module = abundance$Module, value = value)[value > 0, ]
+  top <- function(names, n) {
+    totals <- sort(tapply(links$value, names, sum), decreasing = TRUE)
+    names(totals)[seq_len(min(n, length(totals)))]
+  }
+  topTaxa <- top(links$taxon, taxa)
+  topModules <- top(links$module, modules)
+  shown <- links[links$taxon %in% topTaxa & links$module %in% topModules, ]
+  shown <- shown[order(match(shown$taxon, topTaxa), match(shown$module, topModules)), ]
+  list(
+    links = shown,
+    taxa = topTaxa[topTaxa %in% shown$taxon],
+    modules = topModules[topModules %in% shown$module],
+    share = if (nrow(links) > 0) sum(shown$value) / sum(links$value) else 0
+  )
+}

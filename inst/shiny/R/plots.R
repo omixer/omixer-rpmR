@@ -169,3 +169,49 @@ plotTaxa <- function(shares, title) {
   )
   chartTitle(title, "Share of each taxon in the sum of the module's per-taxon abundances")
 }
+
+# the taxa (light grey arcs) and modules (dark grey arcs) of a chordLinks() result, linked by the module's abundance
+# in the taxon; the links of the `highlight` taxon or module stand out, the others fade (needs circlize)
+plotChord <- function(chord, highlight, title, subtitle) {
+  links <- chord$links
+  if (nrow(links) == 0) {
+    return(emptyChart("No taxon carries a module."))
+  }
+  op <- graphics::par(mar = c(0.5, 0.5, 3.5, 0.5), family = "sans", xpd = NA)
+  on.exit({
+    circlize::circos.clear()
+    graphics::par(op)
+  })
+  sectors <- c(chord$taxa, chord$modules)
+  labels <- stats::setNames(shorten(sectors, 28), sectors)
+  # a wider gap between the taxa and the modules
+  gaps <- c(rep(1.5, length(chord$taxa) - 1), 10, rep(1.5, length(chord$modules) - 1), 10)
+  circlize::circos.par(start.degree = 90, gap.after = gaps, track.margin = c(0.005, 0.005))
+  grid <- stats::setNames(
+    c(rep(ink$axis, length(chord$taxa)), rep(ink$secondary, length(chord$modules))), sectors
+  )
+  selected <- links$taxon == highlight | links$module == highlight
+  colours <- if (any(selected)) {
+    ifelse(selected, series[1], paste0(ink$grid, "80"))
+  } else {
+    rep(paste0(series[1], "73"), nrow(links))
+  }
+  circlize::chordDiagram(links,
+    order = sectors, grid.col = grid, col = colours, transparency = 0, directional = 0,
+    annotationTrack = "grid", annotationTrackHeight = circlize::mm_h(3),
+    preAllocateTracks = list(track.height = 0.01 * max(nchar(labels)))
+  )
+  circlize::circos.track(track.index = 1, bg.border = NA, panel.fun = function(x, y) {
+    sector <- circlize::get.cell.meta.data("sector.index")
+    circlize::circos.text(circlize::get.cell.meta.data("xcenter"), circlize::get.cell.meta.data("ylim")[1],
+      labels[[sector]],
+      facing = "clockwise", niceFacing = TRUE, adj = c(0, 0.5), cex = 0.75,
+      col = if (sector == highlight) ink$primary else ink$secondary, font = if (sector == highlight) 2 else 1
+    )
+  })
+  chartTitle(title, subtitle)
+  graphics::legend("topright",
+    legend = c("taxa", "modules"), fill = c(ink$axis, ink$secondary), border = NA, bty = "n",
+    cex = 0.8, text.col = ink$secondary, inset = c(0, -0.07)
+  )
+}

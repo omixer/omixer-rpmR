@@ -33,6 +33,9 @@
 - New tabs: a **heatmap** of the modules with the highest mean abundance or coverage, the **taxa** of a module (each
   taxon's share of the module's per-taxon abundance, per sample), and the **coverage cutoff** (the module
   observations each cutoff keeps, with the learned or given cutoff). Pointing at a chart shows its values.
+- A **taxa × modules** chord diagram: the taxa and modules with the highest abundance (all samples, or one),
+  linked by the module's abundance in the taxon; a taxon or module can be highlighted. It needs the circlize package
+  (optional).
 - A **long table** download: one row per sample and reported (taxon,) module, with its abundance and coverage.
 - `rpm()` keeps the coverage cutoff of the run in the result (`mods@cutoff`): the given one, or the learned one.
 

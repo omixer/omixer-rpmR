@@ -4,7 +4,8 @@
 #' browse and download the module abundance and coverage tables.
 #'
 #' The app needs the packages shiny, bslib and DT, which are not installed with omixerRpm:
-#' `install.packages(c("shiny", "bslib", "DT"))`.
+#' `install.packages(c("shiny", "bslib", "DT"))`. The "Taxa × modules" chart also needs circlize
+#' (`install.packages("circlize")`); without it, that tab says so and the rest of the app works.
 #'
 #' @param ... Passed on to [shiny::runApp()], e.g. `port` or `launch.browser`.
 #' @seealso [rpm()]

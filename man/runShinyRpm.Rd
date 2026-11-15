@@ -15,7 +15,8 @@ browse and download the module abundance and coverage tables.
 }
 \details{
 The app needs the packages shiny, bslib and DT, which are not installed with omixerRpm:
-\code{install.packages(c("shiny", "bslib", "DT"))}.
+\code{install.packages(c("shiny", "bslib", "DT"))}. The "Taxa × modules" chart also needs circlize
+(\code{install.packages("circlize")}); without it, that tab says so and the rest of the app works.
 }
 \examples{
 \dontrun{

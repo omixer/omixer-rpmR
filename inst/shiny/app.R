@@ -15,6 +15,15 @@ resultPanel <- function(title, id) {
   )
 }
 
+# the message of a tab that needs results per taxon
+perTaxonOnly <- function(what) {
+  p(
+    class = "text-muted",
+    what, "need results per taxon: the input format \"Taxon, then orthologs\" or a stratified HUMAnN table,",
+    "without \"One result per sample\"."
+  )
+}
+
 # a chart with the value under the pointer below it
 chartOutput <- function(id) {
   tagList(
@@ -71,6 +80,7 @@ ui <- page_sidebar(
       chartOutput("heatmap")
     ),
     nav_panel("Taxa", uiOutput("taxa_panel")),
+    nav_panel("Taxa \u00d7 modules", uiOutput("chord_panel")),
     nav_panel(
       "Coverage cutoff",
       chartOutput("cutoff"),
@@ -179,11 +189,7 @@ server <- function(input, output, session) {
   output$taxa_panel <- renderUI({
     req(results())
     if (!"Taxon" %in% colnames(results()$abundance)) {
-      return(p(
-        class = "text-muted",
-        "Taxon contributions need results per taxon: the input format \"Taxon, then orthologs\" or a stratified",
-        "HUMAnN table, without \"One result per sample\"."
-      ))
+      return(perTaxonOnly("Taxon contributions"))
     }
     tagList(
       selectInput("taxa_module", "Module", taxonModules(results()$abundance), width = "100%"),
@@ -220,6 +226,65 @@ server <- function(input, output, session) {
     sprintf(
       "%s, %s: %.1f%% (abundance %s)", colnames(shares)[sample], rownames(shares)[taxon],
       100 * shares[taxon, sample], signif(taxa()$abundance[taxon, sample], 4)
+    )
+  })
+
+  # the taxa and modules with the highest abundance, linked by the module's abundance in the taxon (circlize)
+  output$chord_panel <- renderUI({
+    req(results())
+    if (!"Taxon" %in% colnames(results()$abundance)) {
+      return(perTaxonOnly("The links between taxa and modules"))
+    }
+    if (!requireNamespace("circlize", quietly = TRUE)) {
+      return(p(class = "text-muted", "This chart needs the circlize package: install.packages(\"circlize\")."))
+    }
+    samples <- sampleColumns(results()$abundance)
+    tagList(
+      layout_columns(
+        col_widths = c(3, 3, 3, 3),
+        selectInput("chord_sample", "Samples", c("All samples (sum)" = "", stats::setNames(samples, samples))),
+        sliderInput("chord_taxa", "Taxa", min = 5, max = 30, value = 15, step = 1),
+        sliderInput("chord_modules", "Modules", min = 5, max = 30, value = 15, step = 1),
+        selectInput("chord_highlight", "Highlight", c("None" = ""))
+      ),
+      plotOutput("chord", height = "auto"),
+      uiOutput("chord_key")
+    )
+  })
+  # "" for all samples, also before the controls exist
+  chordSample <- reactive(if (is.null(input$chord_sample)) "" else input$chord_sample)
+  chord <- reactive({
+    req(results(), input$chord_taxa, input$chord_modules)
+    chordLinks(results()$abundance, chordSample(), input$chord_taxa, input$chord_modules)
+  })
+  chordModuleNames <- reactive(paste(chord()$modules, getNames(results()$settings$module.db, chord()$modules)))
+  # the highlight choices follow the taxa and modules shown, and keep the selection while it is shown
+  observe({
+    choices <- list(
+      "None" = "", "Taxa" = stats::setNames(chord()$taxa, chord()$taxa),
+      "Modules" = stats::setNames(chord()$modules, chordModuleNames())
+    )
+    selected <- isolate(input$chord_highlight)
+    keep <- !is.null(selected) && selected %in% c(chord()$taxa, chord()$modules)
+    updateSelectInput(session, "chord_highlight", choices = choices, selected = if (keep) selected else "")
+  })
+  output$chord <- renderPlot(
+    {
+      where <- if (nzchar(chordSample())) paste("sample", chordSample()) else "all samples"
+      subtitle <- sprintf(
+        "The %d taxa and %d modules with the highest abundance (%.0f%% of the total), linked by %s",
+        length(chord()$taxa), length(chord()$modules), 100 * chord()$share, "the module's abundance in the taxon"
+      )
+      plotChord(chord(), input$chord_highlight, paste("Taxa and modules,", where), subtitle)
+    },
+    height = 760
+  )
+  output$chord_key <- renderUI({
+    p(
+      class = "small text-muted",
+      strong("Modules: "), paste(chordModuleNames(), collapse = "; "), br(),
+      "A taxon's abundance of a module is omixer-rpm's estimate of the module in that taxon; the values are in the",
+      "Long table."
     )
   })
 

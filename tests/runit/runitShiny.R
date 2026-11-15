@@ -136,6 +136,7 @@ test.shinyChartsWithoutTaxa <- function() {
       distribute = FALSE, run = 1
     )
     checkTrue(grepl("need results per taxon", output$taxa_panel$html, fixed = TRUE))
+    checkTrue(grepl("need results per taxon", output$chord_panel$html, fixed = TRUE))
     checkEquals(results()$cutoff, 0.3)
     checkTrue(!results()$automatic)
   })
@@ -158,8 +159,52 @@ test.shinyPage <- function() {
   checkTrue(!anyDuplicated(ids), paste("duplicated ids:", paste(unique(ids[duplicated(ids)]), collapse = ", ")))
   for (id in c(
     "download_long", "download_abundance", "download_coverage", "abundance", "coverage", "heatmap",
-    "heatmap_value", "heatmap_measure", "heatmap_rows", "taxa_panel", "cutoff", "cutoff_value"
+    "heatmap_value", "heatmap_measure", "heatmap_rows", "taxa_panel", "chord_panel", "cutoff", "cutoff_value"
   )) {
     checkTrue(sprintf('id="%s"', id) %in% ids, id)
   }
+}
+
+# the links between the taxa and modules with the highest abundance, summed over the samples or of one sample
+test.shinyChord <- function() {
+  if (!requireNamespace("shiny", quietly = TRUE)) {
+    return()
+  }
+  path <- normalizePath("data/species_matrix.tsv")
+  shiny::testServer(system.file("shiny", package = "omixerRpm"), {
+    session$setInputs(
+      input_file = data.frame(name = "species.tsv", size = 1, type = "", datapath = path),
+      annotation = "2", ignore_taxonomy = FALSE, module_db = "GMMs.v1.07", automatic_coverage = FALSE,
+      minimum_coverage = 0.3, score_estimator = "median", complex_rule = "any", normalize_by_length = FALSE,
+      distribute = FALSE, run = 1
+    )
+    table <- results()$abundance
+    session$setInputs(chord_sample = "", chord_taxa = 15, chord_modules = 15, chord_highlight = "")
+    links <- chord()$links
+    checkEquals(length(chord()$taxa), 15)
+    checkEquals(length(chord()$modules), 15)
+    checkTrue(all(links$taxon %in% chord()$taxa & links$module %in% chord()$modules))
+    checkTrue(chord()$share > 0 && chord()$share <= 1)
+    # a link: the module's abundance in the taxon, summed over the samples
+    row <- table$Taxon == links$taxon[1] & table$Module == links$module[1]
+    checkEquals(links$value[1], table$s06a[row] + table$s06b[row])
+    # the taxa with the highest total come first
+    totals <- sort(tapply(table$s06a + table$s06b, table$Taxon, sum), decreasing = TRUE)
+    checkEquals(chord()$taxa[1], names(totals)[1])
+
+    # one sample
+    session$setInputs(chord_sample = "s06b", chord_taxa = 5, chord_modules = 5)
+    links <- chord()$links
+    row <- table$Taxon == links$taxon[1] & table$Module == links$module[1]
+    checkEquals(links$value[1], table$s06b[row])
+    checkTrue(length(chord()$taxa) <= 5 && length(chord()$modules) <= 5)
+    checkTrue(grepl(chord()$modules[1], output$chord_key$html, fixed = TRUE))
+
+    # the chart draws, also with a highlighted module
+    if (requireNamespace("circlize", quietly = TRUE)) {
+      checkTrue(!is.null(output$chord$src))
+      session$setInputs(chord_highlight = chord()$modules[1])
+      checkTrue(!is.null(output$chord$src))
+    }
+  })
 }
