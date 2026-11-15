@@ -8,14 +8,14 @@ devbuild: clean
 	R CMD build .
 
 clean:
-	rm -f omixerRpm_*.tar.gz TestMain.Rout
+	rm -f omixerRpm_*.tar.gz
 
 install: build
 	sudo R CMD INSTALL --byte-compile omixerRpm_*.tar.gz
 
+# the tests of the installed package; R CMD check runs them too
 testSuite:
-	R CMD BATCH test/TestMain.R
-	grep "^Number of" TestMain.Rout
+	cd tests && Rscript runTests.R
 
 docker:
 	docker build -t omixer/shinyrpm:$(shell sed -n "s/^Version: //p" DESCRIPTION) .

@@ -21,9 +21,9 @@ shinyTables <- function(file, ...) {
 # the app gives the same tables as rpm() with the same options
 test.shinyOptions <- function() {
 	if (!requireNamespace("shiny", quietly = TRUE)) return()
-	tables <- shinyTables("test/matrix.tsv", automatic_coverage = FALSE, minimum_coverage = 0.66,
+	tables <- shinyTables("data/matrix.tsv", automatic_coverage = FALSE, minimum_coverage = 0.66,
 	                      score_estimator = "average", normalize_by_length = TRUE, distribute = TRUE, complex_rule = "all")
-	mods <- rpm("test/matrix.tsv", minimum.coverage = 0.66, score.estimator = "average", normalize.by.length = TRUE,
+	mods <- rpm("data/matrix.tsv", minimum.coverage = 0.66, score.estimator = "average", normalize.by.length = TRUE,
 	            distribute = TRUE, complex.rule = "all")
 	checkEquals(tables$abundance[, c("S1", "S2")], mods@abundance)
 	checkEquals(tables$coverage[, c("S1", "S2")], mods@coverage)
@@ -31,20 +31,20 @@ test.shinyOptions <- function() {
 	checkEquals(tables$abundance$Description[1], getNames(loadDefaultDB(), mods@annotation$Module[1]))
 
 	# the defaults: automatic cutoff
-	tables <- shinyTables("test/matrix.tsv")
-	checkEquals(tables$abundance[, c("S1", "S2")], rpm("test/matrix.tsv")@abundance)
+	tables <- shinyTables("data/matrix.tsv")
+	checkEquals(tables$abundance[, c("S1", "S2")], rpm("data/matrix.tsv")@abundance)
 }
 
 test.shinyTaxa <- function() {
 	if (!requireNamespace("shiny", quietly = TRUE)) return()
-	tables <- shinyTables("test/species_matrix.tsv", annotation = "2", automatic_coverage = FALSE)
+	tables <- shinyTables("data/species_matrix.tsv", annotation = "2", automatic_coverage = FALSE)
 	checkEquals(colnames(tables$coverage)[1:3], c("Taxon", "Module", "Description"))
 	checkEquals(nrow(tables$coverage), 284)
 
 	# HUMAnN, per taxon and per sample
-	tables <- shinyTables("test/humann_ko.tsv", annotation = "humann", automatic_coverage = FALSE)
+	tables <- shinyTables("data/humann_ko.tsv", annotation = "humann", automatic_coverage = FALSE)
 	checkEquals(colnames(tables$abundance)[1:2], c("Taxon", "Module"))
-	tables <- shinyTables("test/humann_ko.tsv", annotation = "humann", automatic_coverage = FALSE,
+	tables <- shinyTables("data/humann_ko.tsv", annotation = "humann", automatic_coverage = FALSE,
 	                      ignore_taxonomy = TRUE)
 	checkEquals(colnames(tables$abundance)[1:3], c("Module", "Description", "S1"))
 }
@@ -52,5 +52,5 @@ test.shinyTaxa <- function() {
 # an omixer-rpm error leaves no tables (the app shows the message)
 test.shinyError <- function() {
 	if (!requireNamespace("shiny", quietly = TRUE)) return()
-	checkTrue(is.null(shinyTables("test/species_matrix.tsv", annotation = "1", automatic_coverage = FALSE)))
+	checkTrue(is.null(shinyTables("data/species_matrix.tsv", annotation = "1", automatic_coverage = FALSE)))
 }

@@ -15,6 +15,7 @@
 - `rpm()` removes its temporary files.
 - `loadDB()` reports the loaded database with `message()` (can be silenced with `suppressMessages()`), not `print()`.
 - Explicit NAMESPACE exports; help pages for every exported function; `R CMD check` gives no warnings.
+- The tests moved to `tests/` (data in `tests/data`) and run in `R CMD check`; `make testSuite` runs them too.
 
 ## Web interface
 

@@ -36,7 +36,7 @@ then open the browser at http://localhost:3838/rpm/
 #### Usage
 
 ##### Mapping example
-Download the example [matrix.tsv](https://github.com/omixer/omixer-rpmR/blob/master/test/matrix.tsv) ([raw link](https://raw.githubusercontent.com/omixer/omixer-rpmR/master/test/matrix.tsv)) form the test [directory](https://github.com/omixer/omixer-rpmR/blob/master/test).
+Download the example [matrix.tsv](https://github.com/omixer/omixer-rpmR/blob/main/tests/data/matrix.tsv) ([raw link](https://raw.githubusercontent.com/omixer/omixer-rpmR/main/tests/data/matrix.tsv)) from the test [data](https://github.com/omixer/omixer-rpmR/tree/main/tests/data).
 
 <pre>library(omixerRpm)
 # read a functional profile matrix into R or create it inside R. Please note that row.names should not be used while reading the matrix. 

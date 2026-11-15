@@ -3,7 +3,7 @@ library(omixerRpm)
 # Ensures correct number of modules and samples is returned 
 test.moduleMapping <- function (){
 	# Test for data.frame, KO only annotation
-	dat <- read.table("test/matrix.tsv", header=T, sep="\t")
+	dat <- read.table("data/matrix.tsv", header=T, sep="\t")
 	mods <- rpm(dat, minimum.coverage=0.3, annotation = 1)
 	checkEquals(nrow(mods@coverage), 96)
 	checkEquals(nrow(mods@abundance), 96)
@@ -13,22 +13,22 @@ test.moduleMapping <- function (){
 	checkEquals(getNames(db, mods@annotation[1,]), "arabinoxylan degradation")
 	
 	# Test for an input file with KO, taxonomic annotation
-	taxon.mods <- rpm("test/species_matrix.tsv", annotation = 2, minimum.coverage=0.3)
+	taxon.mods <- rpm("data/species_matrix.tsv", annotation = 2, minimum.coverage=0.3)
 	checkEquals(nrow(taxon.mods@coverage), 284)
 	checkEquals(ncol(taxon.mods@coverage), 2)
 }
 
 test.callOptions <- function() {
 	# check default
-	mods <- rpm("test/matrix.tsv", annotation = 1, minimum.coverage=0.66)
+	mods <- rpm("data/matrix.tsv", annotation = 1, minimum.coverage=0.66)
 	checkEquals(mods@abundance[which(mods@annotation == 'MF0004'), "S1"], 5457.398359)
 
 	# check with length normalization
-	mods <- rpm("test/matrix.tsv", annotation = 1, minimum.coverage=0.66, normalize.by.length = TRUE)
+	mods <- rpm("data/matrix.tsv", annotation = 1, minimum.coverage=0.66, normalize.by.length = TRUE)
 	checkEquals(mods@abundance[which(mods@annotation == 'MF0004'), "S1"], 708.5907183)
 	
 	# check with length normalization AND --Xdistribute
-	mods <- rpm("test/matrix.tsv", annotation = 1, minimum.coverage=0.66, normalize.by.length = TRUE, distribute = TRUE)
+	mods <- rpm("data/matrix.tsv", annotation = 1, minimum.coverage=0.66, normalize.by.length = TRUE, distribute = TRUE)
 	checkEquals(mods@abundance[which(mods@annotation == 'MF0004'), "S1"], 236.1969061)
 }
 
@@ -48,7 +48,7 @@ test.moduleDbAnnotation <- function() {
 
 test.asDataFrame <- function() {
 	# check default
-	mods <- rpm("test/matrix.tsv", annotation = 1, minimum.coverage=0.3)
+	mods <- rpm("data/matrix.tsv", annotation = 1, minimum.coverage=0.3)
 	coverage <- asDataFrame(mods, "coverage")
 	checkEquals(nrow(coverage), 96)
 	checkEquals(ncol(coverage), 4)
@@ -58,13 +58,13 @@ test.asDataFrame <- function() {
 	checkEquals(colnames(coverage), c("Module", "Description", "S1", "S2"))
 
 	# per taxon: the Taxon and Module columns are kept
-	coverage <- asDataFrame(rpm("test/species_matrix.tsv", annotation = 2, minimum.coverage = 0.3), "coverage")
+	coverage <- asDataFrame(rpm("data/species_matrix.tsv", annotation = 2, minimum.coverage = 0.3), "coverage")
 	checkEquals(colnames(coverage)[1:3], c("Taxon", "Module", "Description"))
 
 	# a database made with ModuleDB(): same table
 	db <- ModuleDB(directory = system.file("extdata", package = "omixerRpm"), modules = "GMMs.v1.07.txt",
 	               module.names.file = "GMMs.v1.07.names")
-	checkEquals(asDataFrame(rpm("test/matrix.tsv", minimum.coverage = 0.3, module.db = db), "coverage"),
+	checkEquals(asDataFrame(rpm("data/matrix.tsv", minimum.coverage = 0.3, module.db = db), "coverage"),
 	            asDataFrame(mods, "coverage"))
 }
 
@@ -85,7 +85,7 @@ test.moduleDbLoad <- function() {
 
 test.handleMalformedInput <- function() {
 	# a taxon matrix given as annotation 1
-	checkException(rpm("test/species_matrix.tsv", annotation = 1, minimum.coverage = 0.3))
+	checkException(rpm("data/species_matrix.tsv", annotation = 1, minimum.coverage = 0.3))
 }
 
 # One subunit of the complexes K01184,K01213 (MF0003) and K02786,K02787,K02788 (MF0007) is observed
@@ -105,7 +105,7 @@ test.complexRule <- function() {
 }
 
 test.invalidComplexRule <- function() {
-	checkException(rpm("test/matrix.tsv", annotation = 1, minimum.coverage = 0.3, complex.rule = "fraction"))
+	checkException(rpm("data/matrix.tsv", annotation = 1, minimum.coverage = 0.3, complex.rule = "fraction"))
 }
 
 # A HUMAnN KO table (humann_regroup_table, humann_rename_table): MF0003 is K01051, then K01184,K01213 or K18650.
@@ -115,7 +115,7 @@ test.humann <- function() {
 	db <- loadDB("GMMs.v1.07")
 
 	# per taxon (stratified rows only)
-	mods <- rpm("test/humann_ko.tsv", annotation = "humann", minimum.coverage = 0.3, module.db = db)
+	mods <- rpm("data/humann_ko.tsv", annotation = "humann", minimum.coverage = 0.3, module.db = db)
 	checkEquals(colnames(mods@annotation), c("Taxon", "Module"))
 	checkEquals(colnames(mods@abundance), c("S1", "S2"))
 	fragilis <- which(mods@annotation$Taxon == "g__Bacteroides.s__Bacteroides_fragilis" & mods@annotation$Module == "MF0003")
@@ -125,30 +125,30 @@ test.humann <- function() {
 	checkEquals(mods@coverage[unclassified, "S1"], 0.5)
 
 	# per sample (community totals only, never added to their strata)
-	mods <- rpm("test/humann_ko.tsv", annotation = "humann", minimum.coverage = 0.3, module.db = db, ignore.taxonomy = TRUE)
+	mods <- rpm("data/humann_ko.tsv", annotation = "humann", minimum.coverage = 0.3, module.db = db, ignore.taxonomy = TRUE)
 	checkEquals(colnames(mods@annotation), "Module")
 	checkEquals(mods@annotation$Module, "MF0003")
 	checkEquals(unlist(mods@abundance[1, ]), c(S1 = 4.5, S2 = 3.5))
 
 	# a table read into R is refused: read.table() turns its first data row into the header
-	dat <- read.table("test/humann_ko.tsv", header = TRUE, sep = "\t")
+	dat <- read.table("data/humann_ko.tsv", header = TRUE, sep = "\t")
 	checkException(rpm(dat, annotation = "humann", minimum.coverage = 0.3, module.db = db))
 
 	# a table without strata (humann --remove-stratified-output) gives one result per sample
 	totals <- tempfile(fileext = ".tsv")
-	writeLines(grep("|", readLines("test/humann_ko.tsv"), fixed = TRUE, invert = TRUE, value = TRUE), totals)
+	writeLines(grep("|", readLines("data/humann_ko.tsv"), fixed = TRUE, invert = TRUE, value = TRUE), totals)
 	mods <- rpm(totals, annotation = "humann", minimum.coverage = 0.3, module.db = db)
 	checkEquals(colnames(mods@annotation), "Module")
 	checkEquals(unlist(mods@abundance[1, ]), c(S1 = 4.5, S2 = 3.5))
 }
 
 test.humannDirectoryRejected <- function() {
-	checkException(rpm("test", annotation = "humann", minimum.coverage = 0.3))
+	checkException(rpm("data", annotation = "humann", minimum.coverage = 0.3))
 }
 
 test.ignoreTaxonomy <- function() {
 	# a taxon matrix per sample: one row per module, as for annotation 1
-	mods <- rpm("test/species_matrix.tsv", annotation = 2, minimum.coverage = 0.3, ignore.taxonomy = TRUE)
+	mods <- rpm("data/species_matrix.tsv", annotation = 2, minimum.coverage = 0.3, ignore.taxonomy = TRUE)
 	checkEquals(colnames(mods@annotation), "Module")
 	checkEquals(anyDuplicated(mods@annotation$Module), 0)
 	checkEquals(ncol(mods@abundance), 2)
@@ -156,14 +156,14 @@ test.ignoreTaxonomy <- function() {
 
 # a failed run stops with omixer-rpm's own message
 test.errorMessage <- function() {
-	message <- tryCatch(rpm("test/species_matrix.tsv", annotation = 1, minimum.coverage = 0.3),
+	message <- tryCatch(rpm("data/species_matrix.tsv", annotation = 1, minimum.coverage = 0.3),
 	                    error = conditionMessage)
 	checkTrue(grepl("species_matrix.tsv, line 2: ", message, fixed = TRUE))
 	checkTrue(grepl("is not KO<TAB>one abundance per sample", message, fixed = TRUE))
 	checkTrue(!grepl("ERROR - ", message, fixed = TRUE))
 
 	# a command line error
-	message <- tryCatch(rpm("test/matrix.tsv", annotation = 1, minimum.coverage = 0.3, complex.rule = "fraction"),
+	message <- tryCatch(rpm("data/matrix.tsv", annotation = 1, minimum.coverage = 0.3, complex.rule = "fraction"),
 	                    error = conditionMessage)
 	checkTrue(grepl("fraction", message, fixed = TRUE))
 }
@@ -171,7 +171,7 @@ test.errorMessage <- function() {
 test.pathWithSpaces <- function() {
 	dir <- file.path(tempfile(), "a folder")
 	dir.create(dir, recursive = TRUE)
-	file.copy("test/matrix.tsv", file.path(dir, "my matrix.tsv"))
+	file.copy("data/matrix.tsv", file.path(dir, "my matrix.tsv"))
 	mods <- rpm(file.path(dir, "my matrix.tsv"), annotation = 1, minimum.coverage = 0.66)
 	checkEquals(mods@abundance[which(mods@annotation == 'MF0004'), "S1"], 5457.398359)
 }
@@ -180,6 +180,6 @@ test.javaNotFound <- function() {
 	path <- Sys.getenv("PATH")
 	on.exit(Sys.setenv(PATH = path))
 	Sys.setenv(PATH = tempdir())
-	message <- tryCatch(rpm("test/matrix.tsv", annotation = 1), error = conditionMessage)
+	message <- tryCatch(rpm("data/matrix.tsv", annotation = 1), error = conditionMessage)
 	checkTrue(grepl("Java was not found", message, fixed = TRUE))
 }
