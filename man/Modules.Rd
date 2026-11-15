@@ -32,6 +32,9 @@ table with the module descriptions. \code{Modules(...)} makes one from its slots
 \item{\code{annotation}}{The key columns of the rows (Module, or Taxon and Module).}
 
 \item{\code{db}}{The \link{ModuleDB} of the modules.}
+
+\item{\code{cutoff}}{The coverage cutoff of the run: the given \code{minimum.coverage}, or the one learned from the data; NA when
+no module was observed.}
 }}
 
 \examples{

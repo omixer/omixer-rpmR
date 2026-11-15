@@ -38,7 +38,10 @@ test.moduleDbAnnotation <- function() {
   # check getNames returns the correct annotation
   checkEquals(getNames(db, "MF0010"), "sucrose degradation I")
   # several modules at once; NA for an unknown module
-  checkEquals(getNames(db, c("MF0010", "unknown", "MF0001")), c("sucrose degradation I", NA, "arabinoxylan degradation"))
+  checkEquals(
+    getNames(db, c("MF0010", "unknown", "MF0001")),
+    c("sucrose degradation I", NA, "arabinoxylan degradation")
+  )
   # a database made with ModuleDB() reads the names from its file
   db <- ModuleDB(
     directory = system.file("extdata", package = "omixerRpm"), modules = "GMMs.v1.07.txt",
@@ -124,14 +127,18 @@ test.humann <- function() {
   mods <- rpm("data/humann_ko.tsv", annotation = "humann", minimum.coverage = 0.3, module.db = db)
   checkEquals(colnames(mods@annotation), c("Taxon", "Module"))
   checkEquals(colnames(mods@abundance), c("S1", "S2"))
-  fragilis <- which(mods@annotation$Taxon == "g__Bacteroides.s__Bacteroides_fragilis" & mods@annotation$Module == "MF0003")
+  fragilis <- which(
+    mods@annotation$Taxon == "g__Bacteroides.s__Bacteroides_fragilis" & mods@annotation$Module == "MF0003"
+  )
   checkEquals(mods@coverage[fragilis, "S1"], 1)
   checkEquals(mods@abundance[fragilis, "S1"], 3.5)
   unclassified <- which(mods@annotation$Taxon == "unclassified" & mods@annotation$Module == "MF0003")
   checkEquals(mods@coverage[unclassified, "S1"], 0.5)
 
   # per sample (community totals only, never added to their strata)
-  mods <- rpm("data/humann_ko.tsv", annotation = "humann", minimum.coverage = 0.3, module.db = db, ignore.taxonomy = TRUE)
+  mods <- rpm("data/humann_ko.tsv",
+    annotation = "humann", minimum.coverage = 0.3, module.db = db, ignore.taxonomy = TRUE
+  )
   checkEquals(colnames(mods@annotation), "Module")
   checkEquals(mods@annotation$Module, "MF0003")
   checkEquals(unlist(mods@abundance[1, ]), c(S1 = 4.5, S2 = 3.5))
@@ -158,6 +165,17 @@ test.ignoreTaxonomy <- function() {
   checkEquals(colnames(mods@annotation), "Module")
   checkEquals(anyDuplicated(mods@annotation$Module), 0)
   checkEquals(ncol(mods@abundance), 2)
+}
+
+# the cutoff of the run: the given one, or the learned one
+test.cutoff <- function() {
+  checkEquals(rpm("data/matrix.tsv", minimum.coverage = 0.3)@cutoff, 0.3)
+  learned <- rpm("data/matrix.tsv")@cutoff
+  checkTrue(learned > 0 && learned <= 1)
+  # the learned cutoff is the one omixer-rpm applies: the same modules as with that fixed cutoff
+  checkEquals(rpm("data/matrix.tsv")@annotation, rpm("data/matrix.tsv", minimum.coverage = learned)@annotation)
+  # no module observed: no cutoff
+  checkTrue(is.na(rpm(data.frame(entry = "K99999", S1 = 1))@cutoff))
 }
 
 # a failed run stops with omixer-rpm's own message

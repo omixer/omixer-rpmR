@@ -65,7 +65,8 @@ added to their strata).}
 }
 \value{
 A \link{Modules} object: the abundance and coverage of the modules (rows) per sample (columns), their key columns
-(Module, or Taxon and Module for results per taxon) and the module database. \code{\link[=asDataFrame]{asDataFrame()}} turns it into one
+(Module, or Taxon and Module for results per taxon), the module database and the coverage cutoff (\verb{@cutoff}, the
+learned one with \code{minimum.coverage = -1}). \code{\link[=asDataFrame]{asDataFrame()}} turns it into one
 table with the module descriptions.
 }
 \description{

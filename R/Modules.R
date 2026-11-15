@@ -6,6 +6,8 @@
 #' @slot abundance,coverage data.frames of the modules (rows) per sample (columns).
 #' @slot annotation The key columns of the rows (Module, or Taxon and Module).
 #' @slot db The [ModuleDB] of the modules.
+#' @slot cutoff The coverage cutoff of the run: the given `minimum.coverage`, or the one learned from the data; NA when
+#'   no module was observed.
 #' @author Youssef Darzi
 #' @examples
 #' \dontrun{
@@ -20,13 +22,15 @@ Modules <- setClass(
     coverage = "data.frame",
     abundance = "data.frame",
     annotation = "data.frame",
-    db = "ModuleDB"
+    db = "ModuleDB",
+    cutoff = "numeric"
   ),
   prototype = list(
     coverage = NULL,
     abundance = NULL,
     annotation = NULL,
-    db = NULL
+    db = NULL,
+    cutoff = NA_real_
   ),
   # abundance and coverage hold the same modules and samples
   validity = function(object) {

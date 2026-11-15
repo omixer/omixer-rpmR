@@ -36,7 +36,8 @@
 #'   each whole sample instead of each taxon of a sample. For HUMAnN tables, the community total rows are used (never
 #'   added to their strata).
 #' @return A [Modules] object: the abundance and coverage of the modules (rows) per sample (columns), their key columns
-#'   (Module, or Taxon and Module for results per taxon) and the module database. [asDataFrame()] turns it into one
+#'   (Module, or Taxon and Module for results per taxon), the module database and the coverage cutoff (`@cutoff`, the
+#'   learned one with `minimum.coverage = -1`). [asDataFrame()] turns it into one
 #'   table with the module descriptions.
 #' @section Java:
 #' omixer-rpm needs Java 21 or newer. `rpm()` runs `JAVA_HOME/bin/java` when the environment variable `JAVA_HOME`
@@ -143,7 +144,14 @@ rpm <- function(x, minimum.coverage = -1, score.estimator = "median", annotation
   abundance <- abundance[, -keys, drop = FALSE]
   coverage <- coverage[, -keys, drop = FALSE]
 
-  Modules(abundance = abundance, coverage = coverage, annotation = annotation.df, db = module.db)
+  Modules(abundance = abundance, coverage = coverage, annotation = annotation.df, db = module.db, cutoff = .cutoff(log))
+}
+
+# the coverage cutoff of a run, from omixer-rpm's "Coverage cutoff: 0.6" line; NA for "none (no module observed)"
+.cutoff <- function(log) {
+  line <- grep("Coverage cutoff: ", log, fixed = TRUE, value = TRUE)
+  value <- suppressWarnings(as.numeric(sub(".*Coverage cutoff: ", "", line)))
+  if (length(value) == 1) value else NA_real_
 }
 
 # the java to run: JAVA_HOME/bin/java when JAVA_HOME holds one (as Gradle and Maven do), else java from the PATH;

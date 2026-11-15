@@ -15,6 +15,14 @@ resultPanel <- function(title, id) {
   )
 }
 
+# a chart with the value under the pointer below it
+chartOutput <- function(id) {
+  tagList(
+    plotOutput(id, height = "auto", hover = hoverOpts(paste0(id, "_hover"), delay = 80, delayType = "debounce")),
+    div(class = "small text-muted", textOutput(paste0(id, "_value")))
+  )
+}
+
 ui <- page_sidebar(
   title = "Omixer-RPM",
   sidebar = sidebar(
@@ -46,14 +54,36 @@ ui <- page_sidebar(
     input_task_button("run", "Run"),
     p(class = "small text-muted", "Designed by", a("Omixer Solutions", href = "https://omixer.io/", target = "_blank"))
   ),
+  div(
+    downloadButton("download_long", "Long table (TSV)", class = "btn-sm"),
+    span(class = "small text-muted ms-2", "one row per sample and reported module: abundance and coverage")
+  ),
   navset_card_underline(
     resultPanel("Abundance", "abundance"),
-    resultPanel("Coverage", "coverage")
+    resultPanel("Coverage", "coverage"),
+    nav_panel(
+      "Heatmap",
+      layout_columns(
+        col_widths = c(4, 8),
+        radioButtons("heatmap_measure", "Value", c("Abundance" = "abundance", "Coverage" = "coverage"), inline = TRUE),
+        sliderInput("heatmap_rows", "Modules shown (highest mean first)", min = 5, max = 100, value = 30, step = 5)
+      ),
+      chartOutput("heatmap")
+    ),
+    nav_panel("Taxa", uiOutput("taxa_panel")),
+    nav_panel(
+      "Coverage cutoff",
+      chartOutput("cutoff"),
+      p(
+        class = "small text-muted",
+        "Computed with a second run at cutoff 0 and the same settings, when this tab is first opened."
+      )
+    )
   )
 )
 
 server <- function(input, output, session) {
-  # this session's tables, NULL until a run succeeds
+  # this session's last successful run: its tables, cutoff and settings; NULL until a run succeeds
   results <- reactiveVal(NULL)
 
   observeEvent(input$run, {
@@ -62,25 +92,26 @@ server <- function(input, output, session) {
       showNotification("Choose an input table first.", type = "warning")
       return()
     }
-    modules <- tryCatch(
-      rpm(
-        x = input$input_file$datapath,
-        minimum.coverage = if (input$automatic_coverage) -1 else input$minimum_coverage,
-        score.estimator = input$score_estimator,
-        annotation = input$annotation,
-        module.db = loadDB(input$module_db),
-        normalize.by.length = input$normalize_by_length,
-        distribute = input$distribute,
-        complex.rule = input$complex_rule,
-        ignore.taxonomy = input$ignore_taxonomy
-      ),
-      error = function(e) {
-        showNotification(conditionMessage(e), type = "error", duration = NULL)
-        NULL
-      }
+    settings <- list(
+      x = input$input_file$datapath,
+      minimum.coverage = if (input$automatic_coverage) -1 else input$minimum_coverage,
+      score.estimator = input$score_estimator,
+      annotation = input$annotation,
+      module.db = loadDB(input$module_db),
+      normalize.by.length = input$normalize_by_length,
+      distribute = input$distribute,
+      complex.rule = input$complex_rule,
+      ignore.taxonomy = input$ignore_taxonomy
     )
+    modules <- tryCatch(do.call(rpm, settings), error = function(e) {
+      showNotification(conditionMessage(e), type = "error", duration = NULL)
+      NULL
+    })
     if (!is.null(modules)) {
-      results(list(abundance = asDataFrame(modules, "abundance"), coverage = asDataFrame(modules, "coverage")))
+      results(list(
+        abundance = asDataFrame(modules, "abundance"), coverage = asDataFrame(modules, "coverage"),
+        cutoff = modules@cutoff, automatic = settings$minimum.coverage == -1, settings = settings
+      ))
     }
   })
 
@@ -100,6 +131,123 @@ server <- function(input, output, session) {
       )
     })
   }
+
+  # A4: the long table
+  output$download_long <- downloadHandler(
+    filename = "modules-long.tsv",
+    content = function(file) {
+      req(results())
+      long <- longTable(results()$abundance, results()$coverage)
+      write.table(long, file, row.names = FALSE, sep = "\t", quote = FALSE)
+    }
+  )
+
+  # A2: the heatmap of the rows with the highest mean
+  heatmap <- reactive({
+    req(results())
+    log <- input$heatmap_measure == "abundance"
+    heatmapMatrix(results()[[input$heatmap_measure]], input$heatmap_rows, log = log)
+  })
+  output$heatmap <- renderPlot(
+    {
+      value <- if (input$heatmap_measure == "abundance") "abundance (log scale)" else "coverage"
+      plotHeatmap(heatmap(), sprintf("Top %d modules by mean %s", nrow(heatmap()), value),
+        log = input$heatmap_measure == "abundance"
+      )
+    },
+    height = function() 170 + 18 * max(5, nrow(heatmap()))
+  )
+  output$heatmap_value <- renderText({
+    hover <- input$heatmap_hover
+    values <- heatmap()
+    cell <- if (!is.null(hover)) c(nrow(values) - round(hover$y) + 1, round(hover$x)) else c(0, 0)
+    if (!all(cell >= 1 & cell <= dim(values))) {
+      return("Point at a cell to see its value.")
+    }
+    value <- values[cell[1], cell[2]]
+    shown <- if (is.na(value)) {
+      "not reported"
+    } else if (input$heatmap_measure == "abundance") {
+      signif(10^value, 4)
+    } else {
+      signif(value, 3)
+    }
+    sprintf("%s, %s: %s", colnames(values)[cell[2]], rownames(values)[cell[1]], shown)
+  })
+
+  # A3: the taxa of a module, for results per taxon
+  output$taxa_panel <- renderUI({
+    req(results())
+    if (!"Taxon" %in% colnames(results()$abundance)) {
+      return(p(
+        class = "text-muted",
+        "Taxon contributions need results per taxon: the input format \"Taxon, then orthologs\" or a stratified",
+        "HUMAnN table, without \"One result per sample\"."
+      ))
+    }
+    tagList(
+      selectInput("taxa_module", "Module", taxonModules(results()$abundance), width = "100%"),
+      chartOutput("taxa"),
+      p(
+        class = "small text-muted",
+        "Each taxon's abundance is omixer-rpm's estimate of the module in that taxon. The shares are of their sum,",
+        "which is not the module's abundance in the whole community. The values are in the Long table."
+      )
+    )
+  })
+  taxa <- reactive({
+    req(results(), input$taxa_module)
+    taxonShares(results()$abundance, input$taxa_module)
+  })
+  output$taxa <- renderPlot(
+    {
+      module <- input$taxa_module
+      plotTaxa(taxa()$shares, paste(module, getNames(results()$settings$module.db, module)))
+    },
+    height = 460
+  )
+  output$taxa_value <- renderText({
+    hover <- input$taxa_hover
+    shares <- taxa()$shares
+    sample <- if (is.null(hover)) 0 else round(hover$x)
+    if (sample < 1 || sample > ncol(shares) || hover$y < 0 || hover$y > 1) {
+      return("Point at a bar to see a taxon's share.")
+    }
+    taxon <- which(hover$y <= cumsum(shares[, sample]))[1]
+    if (is.na(taxon)) {
+      return(sprintf("%s: no taxon carries this module.", colnames(shares)[sample]))
+    }
+    sprintf(
+      "%s, %s: %.1f%% (abundance %s)", colnames(shares)[sample], rownames(shares)[taxon],
+      100 * shares[taxon, sample], signif(taxa()$abundance[taxon, sample], 4)
+    )
+  })
+
+  # A1: the coverage distribution, from a second run at cutoff 0 with the same settings
+  distribution <- reactive({
+    req(results())
+    settings <- utils::modifyList(results()$settings, list(minimum.coverage = 0))
+    modules <- tryCatch(do.call(rpm, settings), error = function(e) {
+      showNotification(conditionMessage(e), type = "error", duration = NULL)
+      NULL
+    })
+    req(modules)
+    coverageDistribution(asDataFrame(modules, "coverage"))
+  })
+  output$cutoff <- renderPlot(
+    plotCoverage(distribution(), results()$cutoff, results()$automatic),
+    height = 440
+  )
+  output$cutoff_value <- renderText({
+    hover <- input$cutoff_hover
+    points <- distribution()
+    nearest <- if (is.null(hover) || nrow(points) == 0) NA else which.min(abs(points$coverage - hover$x))
+    if (is.na(nearest) || abs(points$coverage[nearest] - hover$x) > 0.03) {
+      total <- max(c(0, points$kept))
+      return(sprintf("%d module observations in total. Point at a dot to see what a cutoff keeps.", total))
+    }
+    sprintf("Cutoff %s keeps %d module observations.", format(points$coverage[nearest]), points$kept[nearest])
+  })
 }
 
 shinyApp(ui = ui, server = server)

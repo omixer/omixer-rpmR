@@ -23,6 +23,12 @@
 
 ## Web interface
 
+- New tabs: a **heatmap** of the modules with the highest mean abundance or coverage, the **taxa** of a module (each
+  taxon's share of the module's per-taxon abundance, per sample), and the **coverage cutoff** (the module
+  observations each cutoff keeps, with the learned or given cutoff). Pointing at a chart shows its values.
+- A **long table** download: one row per sample and reported (taxon,) module, with its abundance and coverage.
+- `rpm()` keeps the coverage cutoff of the run in the result (`mods@cutoff`): the given one, or the learned one.
+
 - `runShinyRpm()` starts the Shiny app from R. It needs shiny, bslib and DT (suggested packages, not installed with
   omixerRpm).
 - The app was rewritten: it passes every option to `rpm()` (the estimator, length normalization and `distribute`
