@@ -1,11 +1,10 @@
 #' Run omixer-rpm from a web interface
 #'
 #' Starts a Shiny app in the browser: upload a KO table, choose the module database and the options of [rpm()], then
-#' browse and download the module abundance and coverage tables.
+#' browse and download the module abundance and coverage tables, and explore them in interactive charts.
 #'
-#' The app needs the packages shiny, bslib and DT, which are not installed with omixerRpm:
-#' `install.packages(c("shiny", "bslib", "DT"))`. The "Taxa × modules" chart also needs circlize
-#' (`install.packages("circlize")`); without it, that tab says so and the rest of the app works.
+#' The app needs packages that are not installed with omixerRpm:
+#' `install.packages(c("shiny", "bslib", "DT", "ggplot2", "plotly", "r2d3"))`.
 #'
 #' @param ... Passed on to [shiny::runApp()], e.g. `port` or `launch.browser`.
 #' @seealso [rpm()]
@@ -15,8 +14,9 @@
 #' }
 #' @export
 runShinyRpm <- function(...) {
-  # shiny, bslib and DT are only suggested, so only users of the app install them
-  missing <- Filter(function(p) !requireNamespace(p, quietly = TRUE), c("shiny", "bslib", "DT"))
+  # the app's packages are only suggested, so only users of the app install them
+  needed <- c("shiny", "bslib", "DT", "ggplot2", "plotly", "r2d3")
+  missing <- Filter(function(p) !requireNamespace(p, quietly = TRUE), needed)
   if (length(missing) > 0) {
     stop(
       "runShinyRpm() needs the packages ", paste(missing, collapse = ", "), ". Install them with ",

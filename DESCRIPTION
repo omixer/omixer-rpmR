@@ -11,7 +11,7 @@ Description: An R interface to the omixer-rpm for metabolic module profiling of 
     <https://github.com/raeslab/omixer-rpm/blob/master/LICENSE>.
 Imports: methods, utils
 SystemRequirements: Java (>= 21)
-Suggests: RUnit, shiny, bslib (>= 0.7.0), DT, circlize
+Suggests: RUnit, shiny, bslib (>= 0.7.0), DT, ggplot2, plotly, r2d3
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

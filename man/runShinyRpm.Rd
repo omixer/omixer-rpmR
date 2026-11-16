@@ -11,12 +11,11 @@ runShinyRpm(...)
 }
 \description{
 Starts a Shiny app in the browser: upload a KO table, choose the module database and the options of \code{\link[=rpm]{rpm()}}, then
-browse and download the module abundance and coverage tables.
+browse and download the module abundance and coverage tables, and explore them in interactive charts.
 }
 \details{
-The app needs the packages shiny, bslib and DT, which are not installed with omixerRpm:
-\code{install.packages(c("shiny", "bslib", "DT"))}. The "Taxa × modules" chart also needs circlize
-(\code{install.packages("circlize")}); without it, that tab says so and the rest of the app works.
+The app needs packages that are not installed with omixerRpm:
+\code{install.packages(c("shiny", "bslib", "DT", "ggplot2", "plotly", "r2d3"))}.
 }
 \examples{
 \dontrun{

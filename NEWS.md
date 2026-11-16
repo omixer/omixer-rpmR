@@ -30,17 +30,17 @@
 
 ## Web interface
 
-- New tabs: a **heatmap** of the modules with the highest mean abundance or coverage, the **taxa** of a module (each
-  taxon's share of the module's per-taxon abundance, per sample), and the **coverage cutoff** (the module
-  observations each cutoff keeps, with the learned or given cutoff). Pointing at a chart shows its values.
-- A **taxa × modules** chord diagram: the taxa and modules with the highest abundance (all samples, or one),
-  linked by the module's abundance in the taxon; a taxon or module can be highlighted. It needs the circlize package
-  (optional).
+- New tabs, all interactive (values as tooltips, zoom, legend entries that hide a series, image export): a **heatmap**
+  of the modules with the highest mean abundance or coverage, the **taxa** of a module (each taxon's share of the
+  module's per-taxon abundance, per sample), **taxa × modules** (a chord diagram of the taxa and modules with the
+  highest abundance, linked by the module's abundance in the taxon; pointing at a taxon or module highlights its
+  links) and the **coverage cutoff** (the module observations each cutoff keeps, with the learned or given cutoff).
+  The charts are ggplot2 charts shown with plotly; the chord diagram is d3 (r2d3).
 - A **long table** download: one row per sample and reported (taxon,) module, with its abundance and coverage.
 - `rpm()` keeps the coverage cutoff of the run in the result (`mods@cutoff`): the given one, or the learned one.
 
-- `runShinyRpm()` starts the Shiny app from R. It needs shiny, bslib and DT (suggested packages, not installed with
-  omixerRpm).
+- `runShinyRpm()` starts the Shiny app from R. It needs shiny, bslib, DT, ggplot2, plotly and r2d3 (suggested
+  packages, not installed with omixerRpm).
 - The app was rewritten: it passes every option to `rpm()` (the estimator, length normalization and `distribute`
   were ignored before), offers the automatic coverage cutoff, `complex.rule` and `ignore.taxonomy`, keeps each
   user's results separate, shows omixer-rpm errors, accepts uploads up to 1 GB, and both downloads work.

@@ -5,7 +5,7 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends openjdk-21-jre-headless libuv1t64 \
  && rm -rf /var/lib/apt/lists/*
 
-RUN install2.r --error --skipinstalled shiny bslib DT circlize \
+RUN install2.r --error --skipinstalled shiny bslib DT ggplot2 plotly r2d3 \
  && rm -rf /tmp/Rtmp* /tmp/downloaded_packages
 
 COPY . /app

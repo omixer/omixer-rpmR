@@ -1,5 +1,16 @@
 library(omixerRpm)
 
+# the app's code (app.R and R/), for the functions the server uses: testServer() only shows the server's own values
+appCode <- function() {
+  dir <- system.file("shiny", package = "omixerRpm")
+  app <- new.env()
+  for (file in list.files(file.path(dir, "R"), full.names = TRUE)) {
+    sys.source(file, app)
+  }
+  sys.source(file.path(dir, "app.R"), app, chdir = TRUE)
+  app
+}
+
 # runs the app's server on an uploaded file, as the browser would, and returns this session's tables (NULL on error)
 shinyTables <- function(file, ...) {
   tables <- NULL
@@ -78,6 +89,7 @@ test.shinyCharts <- function() {
   }
   path <- normalizePath("data/species_matrix.tsv")
   mods <- rpm(path, annotation = 2)
+  app <- appCode()
   shiny::testServer(system.file("shiny", package = "omixerRpm"), {
     session$setInputs(
       input_file = data.frame(name = "species.tsv", size = 1, type = "", datapath = path),
@@ -114,11 +126,17 @@ test.shinyCharts <- function() {
     module <- as.matrix(table[table$Module == "MF0073", c("s06a", "s06b")])
     checkEquals(unname(colSums(taxa()$abundance)), unname(colSums(module)))
 
-    # the value under the pointer
-    session$setInputs(taxa_hover = list(x = 1, y = 0.01))
-    checkTrue(grepl("^s06a, Faecalibacterium prausnitzii: ", output$taxa_value))
-    session$setInputs(cutoff_hover = list(x = results()$cutoff, y = 0))
-    checkTrue(grepl(sprintf("Cutoff %s keeps", format(results()$cutoff)), output$cutoff_value, fixed = TRUE))
+    # the interactive charts, with the values as tooltips
+    tooltips <- function(chart) unlist(lapply(plotly::plotly_build(chart)$x$data, `[[`, "text"))
+    taxaTips <- tooltips(app$interactive(app$taxaChart(taxa(), "MF0073"), legend = "reversed"))
+    checkTrue(any(grepl("^s06a<br>Faecalibacterium prausnitzii: [0-9.]+%<br>abundance ", taxaTips)))
+    cutoffTips <- tooltips(app$interactive(app$coverageChart(distribution(), results()$cutoff, TRUE)))
+    checkTrue(any(grepl(sprintf("Cutoff %s keeps", signif(results()$cutoff, 3)), cutoffTips, fixed = TRUE)))
+    heatmapTips <- tooltips(app$interactive(app$heatmapChart(heatmap(), log = FALSE, "coverage")))
+    checkTrue(any(grepl(paste0("^s06a<br>", rownames(heatmap())[1], "<br>"), heatmapTips)))
+    for (chart in c("heatmap", "taxa", "cutoff")) {
+      checkTrue(!is.null(output[[chart]]), chart)
+    }
   })
 }
 
@@ -147,19 +165,13 @@ test.shinyPage <- function() {
   if (!requireNamespace("shiny", quietly = TRUE)) {
     return()
   }
-  dir <- system.file("shiny", package = "omixerRpm")
-  app <- new.env()
-  for (file in list.files(file.path(dir, "R"), full.names = TRUE)) {
-    sys.source(file, app)
-  }
-  sys.source(file.path(dir, "app.R"), app, chdir = TRUE)
-  html <- as.character(htmltools::renderTags(app$ui)$html)
+  html <- as.character(htmltools::renderTags(appCode()$ui)$html)
   # the id attributes (not data-tabsetid and the like)
   ids <- regmatches(html, gregexpr('(?<![-\\w])id="[^"]+"', html, perl = TRUE))[[1]]
   checkTrue(!anyDuplicated(ids), paste("duplicated ids:", paste(unique(ids[duplicated(ids)]), collapse = ", ")))
   for (id in c(
-    "download_long", "download_abundance", "download_coverage", "abundance", "coverage", "heatmap",
-    "heatmap_value", "heatmap_measure", "heatmap_rows", "taxa_panel", "chord_panel", "cutoff", "cutoff_value"
+    "download_long", "download_abundance", "download_coverage", "abundance", "coverage", "heatmap_chart",
+    "heatmap_measure", "heatmap_rows", "taxa_panel", "chord_panel", "cutoff"
   )) {
     checkTrue(sprintf('id="%s"', id) %in% ids, id)
   }
@@ -171,6 +183,7 @@ test.shinyChord <- function() {
     return()
   }
   path <- normalizePath("data/species_matrix.tsv")
+  app <- appCode()
   shiny::testServer(system.file("shiny", package = "omixerRpm"), {
     session$setInputs(
       input_file = data.frame(name = "species.tsv", size = 1, type = "", datapath = path),
@@ -179,7 +192,7 @@ test.shinyChord <- function() {
       distribute = FALSE, run = 1
     )
     table <- results()$abundance
-    session$setInputs(chord_sample = "", chord_taxa = 15, chord_modules = 15, chord_highlight = "")
+    session$setInputs(chord_sample = "", chord_taxa = 15, chord_modules = 15)
     links <- chord()$links
     checkEquals(length(chord()$taxa), 15)
     checkEquals(length(chord()$modules), 15)
@@ -200,11 +213,14 @@ test.shinyChord <- function() {
     checkTrue(length(chord()$taxa) <= 5 && length(chord()$modules) <= 5)
     checkTrue(grepl(chord()$modules[1], output$chord_key$html, fixed = TRUE))
 
-    # the chart draws, also with a highlighted module
-    if (requireNamespace("circlize", quietly = TRUE)) {
-      checkTrue(!is.null(output$chord$src))
-      session$setInputs(chord_highlight = chord()$modules[1])
-      checkTrue(!is.null(output$chord$src))
-    }
+    # the d3 chart's data: the taxa then the modules, a symmetric matrix of the links
+    data <- app$chordData(chord(), chordModuleNames())
+    taxa <- length(chord()$taxa)
+    checkEquals(data$kinds, rep(c("taxon", "module"), c(taxa, length(chord()$modules))))
+    checkEquals(data$matrix, t(data$matrix))
+    first <- chord()$links[1, ]
+    checkEquals(data$matrix[match(first$taxon, chord()$taxa), taxa + match(first$module, chord()$modules)], first$value)
+    checkEquals(data$names[taxa + 1], chordModuleNames()[1])
+    checkTrue(!is.null(output$chord))
   })
 }

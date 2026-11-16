@@ -22,9 +22,9 @@ Download the latest source from [the release page](https://github.com/omixer/omi
 #### Web interface (Shiny)
 Upload a KO table, choose the database and the options of `rpm()`, then browse and download the module abundance and
 coverage tables, and charts of them. The app needs the packages shiny, bslib and DT, which are not installed with
-omixerRpm (circlize is optional: the "Taxa × modules" chart needs it):
+omixerRpm:
 <pre>
-install.packages(c("shiny", "bslib", "DT", "circlize"))
+install.packages(c("shiny", "bslib", "DT", "ggplot2", "plotly", "r2d3"))
 omixerRpm::runShinyRpm()
 </pre>
 
