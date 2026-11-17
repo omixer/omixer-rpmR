@@ -8,7 +8,7 @@ R and Java 21 or newer (check with `java -version`). Docker users, please make s
 Download the latest release from [the release page](https://github.com/omixer/omixer-rpmR/releases) and install it
 after replacing x.y.z by the correct version:
 
-<code>R CMD INSTALL omixer-rpmR-x.y.z.tar.gz</code>
+<code>R CMD INSTALL omixerRpm_x.y.z.tar.gz</code>
 
 Or install using latest source, from R:
 
@@ -17,7 +17,7 @@ Or install using latest source, from R:
 
 #### Web interface (Shiny)
 Upload a KO table, choose the database and the options of `rpm()`, then browse and download the module abundance and
-coverage tables, and charts of them. The app needs packages that are not installed with omixer-rpmR:
+coverage tables, and charts of them. The app needs packages that are not installed with omixerRpm:
 <pre>
 install.packages(c("shiny", "bslib", "DT", "ggplot2", "plotly", "r2d3"))
 omixerRpm::runShinyRpm()
@@ -92,8 +92,8 @@ db &lt;- ModuleDB(directory = "/path/to/moduledb/", modules = "module.list", mod
 1. Gut Brain Modules, [Valles-Colomer et al. 2019](https://www.nature.com/articles/s41564-018-0337-x), The neuroactive potential of the human gut microbiota in quality of life and depression, Nature Microbiology 2019.
 2. Gut Metabolic Modules, [Vieira-Silva et al. 2016](https://www.nature.com/articles/nmicrobiol201688), Species-function relationships shape ecological properties of the human gut microbiome, Nature Microbiology 2016.
 
-#### Citing omixer-rpmR
-omixer-rpmR was developed as part of GOmixer. If you use omixer-rpmR in your work please cite: 
+#### Citing omixerRpm
+omixerRpm was developed as part of GOmixer. If you use omixerRpm in your work please cite: 
 
 Youssef Darzi, Gwen Falony, Sara Silva, Jeroen Raes. [Towards biome-specific analysis of meta-omics data](https://www.nature.com/articles/ismej2015188), The ISME journal, 2015.
 
