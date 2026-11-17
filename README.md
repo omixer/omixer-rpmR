@@ -2,20 +2,18 @@
 An R interface to [omixer-rpm](https://github.com/raeslab/omixer-rpm), the tool for metabolic module profiling of microbiome samples
 
 #### Dependencies 
-R and Java 21 or newer (check with `java -version`). `rpm()` uses the Java in `JAVA_HOME` when it is set, and
-otherwise `java` from the `PATH`. The bundled omixer-rpm is version 2.0.0-rc.1, a release candidate: same results as
-1.2.1 apart from the bug fixes in its [changelog](https://github.com/raeslab/omixer-rpm/blob/master/CHANGELOG.md), and
-new support for HUMAnN tables.
+R and Java 21 or newer (check with `java -version`). Docker users, please make sure Java8 is part of the R image.
 
 #### Installation
-On any OS, from R:
-
-<code>remotes::install_github("omixer/omixer-rpmR")</code>
-
-Or download the latest source from [the release page](https://github.com/omixer/omixer-rpmR/releases) and install it
+Download the latest release from [the release page](https://github.com/omixer/omixer-rpmR/releases) and install it
 after replacing x.y.z by the correct version:
 
 <code>R CMD INSTALL omixer-rpmR-x.y.z.tar.gz</code>
+
+Or install using latest source, from R:
+
+<code>remotes::install_github("omixer/omixer-rpmR")</code>
+
 
 #### Web interface (Shiny)
 Upload a KO table, choose the database and the options of `rpm()`, then browse and download the module abundance and
