@@ -26,7 +26,7 @@ omixerRpm::runShinyRpm()
 Or with Docker, from this directory:
 ```bash
 make docker
-docker run --rm -p 3838:3838 omixer/shinyrpm:0.6.0
+docker run --rm -p 3838:3838 omixer/shinyrpm:0.7.0
 ```
 then open the browser at http://localhost:3838/rpm/
 

@@ -1,4 +1,4 @@
-# omixerRpm (development version)
+# omixer-rpmR 0.7.0 (2026-11-17)
 
 ## Changes
 
@@ -46,7 +46,7 @@
   user's results separate, shows omixer-rpm errors, accepts uploads up to 1 GB, and both downloads work.
 - The Docker image uses R 4.6.1 and serves the app at `/rpm/`.
 
-# omixerRpm 0.6.0 (2026-11-03)
+# omixer-rpmR 0.6.0 (2026-11-03)
 
 Bundles **omixer-rpm 2.0.0-rc.1**, a release candidate of omixer-rpm 2.0.
 
