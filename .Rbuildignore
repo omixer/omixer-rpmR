@@ -10,3 +10,4 @@ SUGGESTIONS\.md
 ^\.claude$
 ^\.idea$
 ^TODO\.md$
+^\.github$
