@@ -1,0 +1,37 @@
+# On a version tag (e.g. 0.7.0): build the Shiny app image and push it to Docker Hub as omixer/shinyrpm:<version> and
+# :latest. Needs the repository secrets DOCKERHUB_USERNAME and DOCKERHUB_TOKEN (a Docker Hub access token).
+name: Docker
+
+on:
+  push:
+    tags: ["[0-9]+.[0-9]+.[0-9]+"]
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # the tag must be the package version
+      - name: Check the tag against DESCRIPTION
+        run: |
+          version=$(sed -n 's/^Version: //p' DESCRIPTION)
+          if [ "$version" != "$GITHUB_REF_NAME" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match Version: $version in DESCRIPTION"
+            exit 1
+          fi
+
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            omixer/shinyrpm:${{ github.ref_name }}
+            omixer/shinyrpm:latest
