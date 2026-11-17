@@ -1,28 +1,48 @@
 # omixer-rpmR
 An R interface to [omixer-rpm](https://github.com/raeslab/omixer-rpm), the tool for metabolic module profiling of microbiome samples
 
-#### Dependencies 
-R and Java 21 or newer (Docker users, please make sure Java 21 is part of the R image). `rpm()` uses the Java in
-`JAVA_HOME` when it is set, and otherwise `java` from the `PATH`. The bundled omixer-rpm is
-version 2.0.0-rc.1, a release candidate: same results as 1.2.1 apart from the bug fixes in its
-[changelog](https://github.com/raeslab/omixer-rpm/blob/master/CHANGELOG.md), and new support for HUMAnN tables.
-
 #### Installation
-##### Binaries for Linux only (built and tested on Ubuntu 24.04 LTS with R 4.3.3) 
-Download the latest binary (omixeRpm_x.y.z.tar.gz) from [the release page](https://github.com/omixer/omixer-rpmR/releases), then install it as 
-follows after replacing x.y.z by the correct version 
+omixerRpm is plain R plus the omixer-rpm jar, so it installs the same way on Linux, macOS and Windows. It needs R and
+Java 21 or newer.
 
-<code>R CMD INSTALL omixeRpm_x.y.z.tar.gz</code>
+##### 1. Java 21
+Check the Java version in a terminal:
+<pre>java -version</pre>
+If Java is missing or older than 21, install a Java 21 (or newer) runtime:
+- Ubuntu/Debian: `sudo apt install openjdk-21-jre-headless`
+- macOS and Windows: [Eclipse Temurin 21](https://adoptium.net/temurin/releases/?version=21) (the installer can add it
+  to the `PATH`)
 
-##### From source
-Download the latest source from [the release page](https://github.com/omixer/omixer-rpmR/releases), then install it as follows after replacing x.y.z by the correct version 
+`rpm()` uses the Java in `JAVA_HOME` when it is set, and otherwise `java` from the `PATH`. If an older Java comes first,
+point R at the new one, e.g. in your `.Rprofile`:
+<pre>Sys.setenv(JAVA_HOME = "/usr/lib/jvm/java-21-openjdk-amd64")  # the folder that holds bin/java</pre>
 
-<code>R CMD INSTALL omixer-rpmR-x.y.z.tar.gz</code>
+##### 2. omixerRpm
+From R:
+<pre>
+install.packages("remotes")
+remotes::install_github("omixer/omixer-rpmR")
+</pre>
+Or download a release tarball (omixerRpm_x.y.z.tar.gz) from [the release page](https://github.com/omixer/omixer-rpmR/releases)
+and install it with `install.packages("omixerRpm_x.y.z.tar.gz", repos = NULL)`, or `R CMD INSTALL omixerRpm_x.y.z.tar.gz`
+in a terminal.
+
+##### 3. Check that it works
+<pre>
+library(omixerRpm)
+dat &lt;- read.table("https://raw.githubusercontent.com/omixer/omixer-rpmR/main/tests/data/matrix.tsv",
+  header = TRUE, sep = "\t", check.names = FALSE)
+mods &lt;- rpm(dat)  # prints omixer-rpm's log, ending in "Coverage cutoff: 0.6"
+dim(mods@abundance)  # 76 modules, 2 samples
+</pre>
+A Java problem shows up here as an error that says what to fix (Java not found, or older than 21).
+
+The bundled omixer-rpm is version 2.0.0-rc.1, a release candidate: same results as 1.2.1 apart from the bug fixes in
+its [changelog](https://github.com/raeslab/omixer-rpm/blob/master/CHANGELOG.md), and new support for HUMAnN tables.
 
 #### Web interface (Shiny)
 Upload a KO table, choose the database and the options of `rpm()`, then browse and download the module abundance and
-coverage tables, and charts of them. The app needs the packages shiny, bslib and DT, which are not installed with
-omixerRpm:
+coverage tables, and charts of them. The app needs a few packages that are not installed with omixerRpm:
 <pre>
 install.packages(c("shiny", "bslib", "DT", "ggplot2", "plotly", "r2d3"))
 omixerRpm::runShinyRpm()
