@@ -1,3 +1,11 @@
+# omixerRpm (development version)
+
+## Changes
+
+- `asDataFrame(mods, "merged")`: abundance and coverage in one table, one row per sample and reported module (columns
+  Sample, (Taxon,) Module, Description, Abundance, Coverage). The app's download of it is now "Merged table"
+  (`modules-merged.tsv`, was "Long table", `modules-long.tsv`).
+
 # omixerRpm 0.7.0 (2026-11-17)
 
 ## Changes

@@ -1,7 +1,8 @@
 #' Module profiles
 #'
 #' The result of [rpm()]: the abundance and coverage of the modules per sample. `asDataFrame()` gives one of them as a
-#' table with the module descriptions. `Modules(...)` makes one from its slots, given by name.
+#' table with the module descriptions, or both merged into one table. `Modules(...)` makes one from its slots, given
+#' by name.
 #'
 #' @slot abundance,coverage data.frames of the modules (rows) per sample (columns).
 #' @slot annotation The key columns of the rows (Module, or Taxon and Module).
@@ -13,6 +14,8 @@
 #' \dontrun{
 #' mods <- rpm("matrix.tsv", minimum.coverage = 0.3)
 #' coverage <- asDataFrame(mods, "coverage")
+#' # one row per sample and reported module, with its abundance and coverage
+#' merged <- asDataFrame(mods, "merged")
 #' }
 #' @rdname Modules
 #' @export
@@ -45,8 +48,11 @@ Modules <- setClass(
 
 #' @rdname Modules
 #' @param theObject A `Modules` object.
-#' @param type `"abundance"` or `"coverage"`.
-#' @return `asDataFrame()` returns a data.frame: the key columns, the module Description, then one column per sample.
+#' @param type `"abundance"`, `"coverage"` or `"merged"`.
+#' @return `asDataFrame()` returns a data.frame. For `"abundance"` and `"coverage"`: the key columns ((Taxon,) Module),
+#'   the module Description, then one column per sample. For `"merged"`: one row per sample and reported module, with
+#'   the columns Sample, the key columns, Description, Abundance and Coverage; a module below the cutoff in a sample
+#'   (coverage 0) is left out.
 #' @export
 setGeneric(name = "asDataFrame", def = function(theObject, type) {
   standardGeneric("asDataFrame")
@@ -55,9 +61,24 @@ setGeneric(name = "asDataFrame", def = function(theObject, type) {
 #' @rdname Modules
 #' @export
 setMethod(f = "asDataFrame", signature = "Modules", definition = function(theObject, type) {
-  # the key columns ((Taxon,) Module), the module description, then one column per sample
-  cbind(theObject@annotation,
-    Description = getNames(theObject@db, theObject@annotation$Module),
-    slot(theObject, type)
-  )
+  # the key columns ((Taxon,) Module) and the module description
+  keys <- cbind(theObject@annotation, Description = getNames(theObject@db, theObject@annotation$Module))
+  if (identical(type, "merged")) {
+    return(.merged(theObject, keys))
+  }
+  cbind(keys, slot(theObject, type))
 })
+
+# the rows of every sample one after the other, with the abundance and coverage of each; a module below the cutoff in
+# a sample is 0 in both, and left out
+.merged <- function(theObject, keys) {
+  merged <- do.call(rbind, lapply(colnames(theObject@abundance), function(sample) {
+    data.frame(
+      Sample = rep(sample, nrow(keys)), keys, Abundance = theObject@abundance[[sample]],
+      Coverage = theObject@coverage[[sample]], check.names = FALSE, row.names = NULL
+    )
+  }))
+  merged <- merged[merged$Coverage > 0, , drop = FALSE]
+  rownames(merged) <- NULL
+  merged
+}

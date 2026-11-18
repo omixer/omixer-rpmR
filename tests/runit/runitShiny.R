@@ -82,7 +82,7 @@ test.shinyError <- function() {
   checkTrue(is.null(shinyTables("data/species_matrix.tsv", annotation = "1", automatic_coverage = FALSE)))
 }
 
-# the charts and the long table of a run per taxon, through the server as the browser uses them
+# the charts and the merged table of a run per taxon, through the server as the browser uses them
 test.shinyCharts <- function() {
   if (!requireNamespace("shiny", quietly = TRUE)) {
     return()
@@ -103,12 +103,12 @@ test.shinyCharts <- function() {
     checkTrue(results()$cutoff %in% distribution()$coverage)
     checkTrue(!is.unsorted(distribution()$kept))
 
-    # the long table: one row per reported module of a sample, with both values from the tables
-    long <- read.delim(output$download_long, check.names = FALSE)
-    checkEquals(colnames(long), c("Sample", "Taxon", "Module", "Description", "Abundance", "Coverage"))
-    checkEquals(nrow(long), sum(mods@coverage > 0))
-    checkTrue(all(long$Coverage > 0))
-    row <- long[long$Sample == "s06a", ][1, ]
+    # the merged table: one row per reported module of a sample, with both values from the tables
+    merged <- read.delim(output$download_merged, check.names = FALSE)
+    checkEquals(colnames(merged), c("Sample", "Taxon", "Module", "Description", "Abundance", "Coverage"))
+    checkEquals(nrow(merged), sum(mods@coverage > 0))
+    checkTrue(all(merged$Coverage > 0))
+    row <- merged[merged$Sample == "s06a", ][1, ]
     table <- results()$abundance
     checkEquals(row$Abundance, table$s06a[table$Taxon == row$Taxon & table$Module == row$Module])
 
@@ -170,7 +170,7 @@ test.shinyPage <- function() {
   ids <- regmatches(html, gregexpr('(?<![-\\w])id="[^"]+"', html, perl = TRUE))[[1]]
   checkTrue(!anyDuplicated(ids), paste("duplicated ids:", paste(unique(ids[duplicated(ids)]), collapse = ", ")))
   for (id in c(
-    "download_long", "download_abundance", "download_coverage", "abundance", "coverage", "heatmap_chart",
+    "download_merged", "download_abundance", "download_coverage", "abundance", "coverage", "heatmap_chart",
     "heatmap_measure", "heatmap_rows", "taxa_panel", "chord_panel", "cutoff"
   )) {
     checkTrue(sprintf('id="%s"', id) %in% ids, id)

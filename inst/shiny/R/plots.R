@@ -50,7 +50,7 @@ sampleAxis <- function(samples) {
   }
 }
 
-# A1: the module observations kept at each coverage cutoff (coverageDistribution()), and the cutoff of the run
+# the module observations kept at each coverage cutoff (coverageDistribution()), and the cutoff of the run
 coverageChart <- function(points, cutoff, automatic) {
   if (nrow(points) == 0) {
     return(emptyChart("No module was observed."))
@@ -85,7 +85,7 @@ coverageChart <- function(points, cutoff, automatic) {
   chart
 }
 
-# A2: rows (modules) by samples of a heatmapMatrix(), one blue from light (low) to dark (high); grey where a module is
+# rows (modules) by samples of a heatmapMatrix(), one blue from light (low) to dark (high); grey where a module is
 # not reported. Abundance is on a log10 scale, coverage from 0 to 1.
 heatmapChart <- function(values, log, title) {
   if (nrow(values) == 0 || all(is.na(values))) {
@@ -117,7 +117,7 @@ heatmapChart <- function(values, log, title) {
     ggplot2::theme(panel.grid.major = ggplot2::element_blank(), axis.text.x = sampleAxis(ncol(values)))
 }
 
-# A3: each taxon's share of a module's per-taxon abundance, per sample (taxonShares()); the largest taxa in fixed
+# each taxon's share of a module's per-taxon abundance, per sample (taxonShares()); the largest taxa in fixed
 # colours from the bottom of the bar, the rest grey on top
 taxaChart <- function(taxa, title) {
   shares <- taxa$shares

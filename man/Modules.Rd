@@ -15,14 +15,18 @@ asDataFrame(theObject, type)
 \arguments{
 \item{theObject}{A \code{Modules} object.}
 
-\item{type}{\code{"abundance"} or \code{"coverage"}.}
+\item{type}{\code{"abundance"}, \code{"coverage"} or \code{"merged"}.}
 }
 \value{
-\code{asDataFrame()} returns a data.frame: the key columns, the module Description, then one column per sample.
+\code{asDataFrame()} returns a data.frame. For \code{"abundance"} and \code{"coverage"}: the key columns ((Taxon,) Module),
+the module Description, then one column per sample. For \code{"merged"}: one row per sample and reported module, with
+the columns Sample, the key columns, Description, Abundance and Coverage; a module below the cutoff in a sample
+(coverage 0) is left out.
 }
 \description{
 The result of \code{\link[=rpm]{rpm()}}: the abundance and coverage of the modules per sample. \code{asDataFrame()} gives one of them as a
-table with the module descriptions. \code{Modules(...)} makes one from its slots, given by name.
+table with the module descriptions, or both merged into one table. \code{Modules(...)} makes one from its slots, given
+by name.
 }
 \section{Slots}{
 
@@ -41,6 +45,8 @@ no module was observed.}
 \dontrun{
 mods <- rpm("matrix.tsv", minimum.coverage = 0.3)
 coverage <- asDataFrame(mods, "coverage")
+# one row per sample and reported module, with its abundance and coverage
+merged <- asDataFrame(mods, "merged")
 }
 }
 \author{

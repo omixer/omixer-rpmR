@@ -77,7 +77,7 @@ ui <- page_sidebar(
     p(class = "small text-muted", "Designed by", a("Omixer Solutions", href = "https://omixer.io/", target = "_blank"))
   ),
   div(
-    downloadButton("download_long", "Long table (TSV)", class = "btn-sm"),
+    downloadButton("download_merged", "Merged table (TSV)", class = "btn-sm"),
     span(class = "small text-muted ms-2", "one row per sample and reported module: abundance and coverage")
   ),
   navset_card_underline(
@@ -132,7 +132,7 @@ server <- function(input, output, session) {
     })
     if (!is.null(modules)) {
       results(list(
-        abundance = asDataFrame(modules, "abundance"), coverage = asDataFrame(modules, "coverage"),
+        modules = modules, abundance = asDataFrame(modules, "abundance"), coverage = asDataFrame(modules, "coverage"),
         cutoff = modules@cutoff, automatic = settings$minimum.coverage == -1, settings = settings
       ))
     }
@@ -155,17 +155,16 @@ server <- function(input, output, session) {
     })
   }
 
-  # A4: the long table
-  output$download_long <- downloadHandler(
-    filename = "modules-long.tsv",
+  # one row per sample and reported module, with its abundance and coverage
+  output$download_merged <- downloadHandler(
+    filename = "modules-merged.tsv",
     content = function(file) {
       req(results())
-      long <- longTable(results()$abundance, results()$coverage)
-      write.table(long, file, row.names = FALSE, sep = "\t", quote = FALSE)
+      write.table(asDataFrame(results()$modules, "merged"), file, row.names = FALSE, sep = "\t", quote = FALSE)
     }
   )
 
-  # A2: the heatmap of the rows with the highest mean
+  # the heatmap of the rows with the highest mean
   heatmap <- reactive({
     req(results())
     log <- input$heatmap_measure == "abundance"
@@ -176,15 +175,14 @@ server <- function(input, output, session) {
     plotly::plotlyOutput("heatmap", height = paste0(200 + 18 * max(5, nrow(heatmap())), "px"))
   })
   output$heatmap <- plotly::renderPlotly({
-    value <- if (input$heatmap_measure == "abundance") "abundance" else "coverage"
-    title <- sprintf("Top %d modules by mean %s", nrow(heatmap()), value)
+    title <- sprintf("Top %d modules by mean %s", nrow(heatmap()), input$heatmap_measure)
     chart <- interactive(heatmapChart(heatmap(), log = input$heatmap_measure == "abundance", title))
     # the 2px gaps between cells (the heatmap is the first trace), while the cells stay large enough
     if (length(heatmap()) <= 3600) chart <- plotly::style(chart, xgap = 2, ygap = 2, traces = 1)
     chart
   })
 
-  # A3: the taxa of a module, for results per taxon
+  # the taxa of a module, for results per taxon
   output$taxa_panel <- renderUI({
     req(results())
     if (!"Taxon" %in% colnames(results()$abundance)) {
@@ -196,7 +194,7 @@ server <- function(input, output, session) {
       p(
         class = "small text-muted",
         "Each taxon's abundance is omixer-rpm's estimate of the module in that taxon. The shares are of their sum,",
-        "which is not the module's abundance in the whole community. The values are in the Long table."
+        "which is not the module's abundance in the whole community. The values are in the Merged table."
       )
     )
   })
@@ -253,11 +251,11 @@ server <- function(input, output, session) {
       class = "small text-muted",
       strong("Modules: "), paste(chordModuleNames(), collapse = "; "), br(),
       "A taxon's abundance of a module is omixer-rpm's estimate of the module in that taxon; the values are in the",
-      "Long table."
+      "Merged table."
     )
   })
 
-  # A1: the coverage distribution, from a second run at cutoff 0 with the same settings
+  # the coverage distribution, from a second run at cutoff 0 with the same settings
   distribution <- reactive({
     req(results())
     settings <- utils::modifyList(results()$settings, list(minimum.coverage = 0))

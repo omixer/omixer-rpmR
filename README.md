@@ -54,6 +54,8 @@ getNames(db, mods@annotation[1,])
 
 # get the abundance|coverage as a data.frame with module id and description
 coverage <- asDataFrame(mods, "coverage")
+# or abundance and coverage merged: one row per sample and reported module
+merged <- asDataFrame(mods, "merged")
 </pre>
 
 ##### HUMAnN input

@@ -1,22 +1,9 @@
-# The data behind the app's downloads and charts, from asDataFrame() tables: the key columns ((Taxon,) Module),
+# The data behind the app's charts, from asDataFrame() tables: the key columns ((Taxon,) Module),
 # Description, then one column per sample.
 
 # the sample columns of a table
 sampleColumns <- function(table) {
   colnames(table)[-seq_len(match("Description", colnames(table)))]
-}
-
-# one row per sample and reported (taxon,) module: Sample, (Taxon,) Module, Description, Abundance, Coverage. A module
-# below the cutoff in a sample is 0 in the tables, and left out here.
-longTable <- function(abundance, coverage) {
-  keys <- colnames(abundance)[seq_len(match("Description", colnames(abundance)))]
-  long <- do.call(rbind, lapply(sampleColumns(abundance), function(sample) {
-    data.frame(
-      Sample = rep(sample, nrow(abundance)), abundance[keys], Abundance = abundance[[sample]],
-      Coverage = coverage[[sample]], check.names = FALSE, row.names = NULL
-    )
-  }))
-  long[long$Coverage > 0, , drop = FALSE]
 }
 
 # the coverage distribution omixer-rpm learns the cutoff from, from the coverage table of a run with cutoff 0: every

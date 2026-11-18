@@ -77,6 +77,23 @@ test.asDataFrame <- function() {
   )
 }
 
+# both values in one table: one row per sample and reported module
+test.asDataFrameMerged <- function() {
+  mods <- rpm("data/matrix.tsv", annotation = 1, minimum.coverage = 0.3)
+  merged <- asDataFrame(mods, "merged")
+  checkEquals(colnames(merged), c("Sample", "Module", "Description", "Abundance", "Coverage"))
+  checkEquals(nrow(merged), sum(mods@coverage > 0))
+  checkTrue(all(merged$Coverage > 0))
+  row <- merged[merged$Sample == "S1" & merged$Module == "MF0004", ]
+  module <- which(mods@annotation$Module == "MF0004")
+  checkEquals(row$Abundance, mods@abundance$S1[module])
+  checkEquals(row$Coverage, mods@coverage$S1[module])
+
+  # per taxon: Sample, then the Taxon and Module columns
+  mods <- rpm("data/species_matrix.tsv", annotation = 2, minimum.coverage = 0.3)
+  checkEquals(colnames(asDataFrame(mods, "merged"))[1:3], c("Sample", "Taxon", "Module"))
+}
+
 
 test.moduleDbList <- function() {
   # List available databases.

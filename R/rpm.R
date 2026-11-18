@@ -37,8 +37,7 @@
 #'   added to their strata).
 #' @return A [Modules] object: the abundance and coverage of the modules (rows) per sample (columns), their key columns
 #'   (Module, or Taxon and Module for results per taxon), the module database and the coverage cutoff (`@cutoff`, the
-#'   learned one with `minimum.coverage = -1`). [asDataFrame()] turns it into one
-#'   table with the module descriptions.
+#'   learned one with `minimum.coverage = -1`). [asDataFrame()] turns it into a table with the module descriptions.
 #' @section Java:
 #' omixer-rpm needs Java 21 or newer. `rpm()` runs `JAVA_HOME/bin/java` when the environment variable `JAVA_HOME`
 #' points to a Java installation, and otherwise `java` from the `PATH`. Set it for a session with
