@@ -2,7 +2,7 @@
 % Please edit documentation in R/rpm.R
 \name{rpm}
 \alias{rpm}
-\title{Metabolic module profiling for gut microbiome samples}
+\title{Metabolic module profiling}
 \usage{
 rpm(
   x,
@@ -19,79 +19,59 @@ rpm(
 )
 }
 \arguments{
-\item{x}{A data.frame or a file path containing functional profiles with KEGG KO annotation. Taxonomic annotation
-could be included as well. See \code{annotation} for more info on the formatting. A HUMAnN table (annotation
-\code{"humann"}) must be given as a file path: its header starts with #, which \code{read.table()} drops, so a data.frame
-is refused.}
+\item{x}{A data.frame or the path of a tab-separated file: KO profiles, one column per sample, after the KO column
+(and the taxon column before it, see \code{annotation}). A HUMAnN table must be a file path.}
 
-\item{minimum.coverage}{The minimum pathway coverage to consider a module present. If set to -1 the threshold is
-guessed from the data. Otherwise the value should be between 0 and 1. By default it is set to -1.}
+\item{minimum.coverage}{The coverage (0 to 1) a module needs to be reported; -1 (default) learns it from the data.}
 
-\item{score.estimator}{One of \code{"median"}, \code{"average"}, \code{"sum"} or \code{"min"} to estimate the abundance of the module.
-Default is median.}
+\item{score.estimator}{How a module's abundance is estimated from its steps: \code{"median"} (default), \code{"average"},
+\code{"sum"} or \code{"min"}.}
 
-\item{annotation}{Data annotation. Use 1 for KEGG KO annotation only or 2 for taxonomic followed by KO annotation.
-Use \code{"humann"} for a HUMAnN gene family table regrouped to KOs (\verb{humann_regroup_table --groups uniref90_ko}),
-optionally renormalized and joined into one table (\code{humann_join_tables}): results are per taxon from its
-stratified rows (KO|taxon, unclassified included), or per sample from its community totals with
-\code{ignore.taxonomy = TRUE}; a table without strata gives results per sample. Rows such as UNMAPPED and UNGROUPED
-and KO names are ignored, and sample names lose HUMAnN's _Abundance suffix.}
+\item{annotation}{The input format: \code{1} (default) KOs only; \code{2} taxon, then KO; \code{"humann"} a HUMAnN KO table
+(\verb{humann_regroup_table --groups uniref90_ko}, optionally renormalized and joined), per taxon from its stratified
+rows, or per sample with \code{ignore.taxonomy = TRUE} or without strata.}
 
-\item{module.db}{A \link{ModuleDB} object to locate the database files. If omitted the GMMs database from Vieira-Silva,
-et al 2016 Nat Microbiol (doi:10.1038/nmicrobiol.2016.88) will be used by default.}
+\item{module.db}{A \link{ModuleDB}; default the gut metabolic modules (\code{\link[=loadDefaultDB]{loadDefaultDB()}}).}
 
-\item{threads}{The number of threads to use when mapping KOs onto modules. If > 1, each different thread will
-handle one sample at a time, therefore the number of threads should never be larger than the number of samples.}
+\item{threads}{The number of threads; profiles are scored in parallel.}
 
-\item{normalize.by.length}{Divide module score by its length. When combined with a median estimator, missing
-reactions (score = 0) are included when estimating the median. If the estimated score equals zero then it is
-replaced by the minimum observed reaction score. If this option is specified, score calculation is based only on
-the number of observed reactions.}
+\item{normalize.by.length}{Count the unobserved steps of a module: \code{"sum"} and \code{"average"} are divided by its number
+of steps, and \code{"median"} includes them as 0 (a median of 0 becomes the lowest observed step score).}
 
-\item{distribute}{Experimental feature - When an ortholog is shared by N modules then its abundance is divided by
-N.}
+\item{distribute}{Experimental: divide the abundance of a KO shared by N modules by N.}
 
-\item{java.mem}{The maximum amount of memory (in Gb) to allocate for the underlying omixer-rpm.jar tool. Value is an
-Integer comprised between 1 and the RAM size.}
+\item{java.mem}{The maximum Java heap, in GB; default Java's own.}
 
-\item{complex.rule}{How a complex step (subunits written K1,K2 in the module database) counts when only some
-subunits are observed. \code{"any"} (default): the step is present when at least one subunit is observed, since a
-missing subunit is more often unsampled than absent. \code{"all"}: the step is present only when every subunit is
-observed; otherwise it gets no coverage and no abundance.}
+\item{complex.rule}{When a complex step (KOs written K1,K2 in the database) is present: \code{"any"} (default) when at
+least one subunit is observed, \code{"all"} only when every subunit is.}
 
-\item{ignore.taxonomy}{For taxon-annotated input (annotation 2, or a stratified HUMAnN table), infer the modules of
-each whole sample instead of each taxon of a sample. For HUMAnN tables, the community total rows are used (never
-added to their strata).}
+\item{ignore.taxonomy}{For input per taxon (annotation 2, or a stratified HUMAnN table): one result per sample
+instead of per taxon. HUMAnN tables use their community totals.}
 }
 \value{
 A \link{Modules} object: the abundance and coverage of the modules (rows) per sample (columns), their key columns
-(Module, or Taxon and Module for results per taxon), the module database and the coverage cutoff (\verb{@cutoff}, the
-learned one with \code{minimum.coverage = -1}). \code{\link[=asDataFrame]{asDataFrame()}} turns it into a table with the module descriptions.
+(Module, or Taxon and Module), the database and the coverage cutoff (\verb{@cutoff}). \code{\link[=asDataFrame]{asDataFrame()}} turns it into a
+table.
 }
 \description{
-Generates metabolic module profiles from metagenomic samples.
+Runs omixer-rpm on KEGG KO profiles: the abundance and coverage of each module per sample (or per taxon of a
+sample).
 }
 \section{Java}{
 
-omixer-rpm needs Java 21 or newer. \code{rpm()} runs \code{JAVA_HOME/bin/java} when the environment variable \code{JAVA_HOME}
-points to a Java installation, and otherwise \code{java} from the \code{PATH}. Set it for a session with
-\code{Sys.setenv(JAVA_HOME = "/path/to/jdk-21")}, or for good in \verb{~/.Renviron}.
+omixer-rpm needs Java 21 or newer. \code{rpm()} runs \code{JAVA_HOME/bin/java} when \code{JAVA_HOME} is set, otherwise \code{java} from
+the \code{PATH}, e.g. \code{Sys.setenv(JAVA_HOME = "/path/to/jdk-21")}.
 }
 
 \examples{
 \dontrun{
-# read a functional profile matrix into R or create it inside R. Please note that row.names should not be used
-# while reading the matrix, and that check.names = FALSE keeps the sample names as they are.
+# check.names = FALSE keeps the sample names as they are
 dat <- read.table("matrix.tsv", header = TRUE, sep = "\t", check.names = FALSE)
-# Run the module mapping on the loaded table.
-mods <- rpm(dat, minimum.coverage = 0.3, annotation = 1)
-# alternatively run the mapping without loading the table into R.
-mods <- rpm("matrix.tsv", minimum.coverage = 0.3, annotation = 1)
-# Load the default mapping database
-db <- loadDefaultDB()
-# get the name of the first predicted module
-getNames(db, mods@annotation[1, ])
-# a HUMAnN KO table: per taxon, or per sample with ignore.taxonomy
+mods <- rpm(dat, minimum.coverage = 0.3)
+# or from the file
+mods <- rpm("matrix.tsv", minimum.coverage = 0.3)
+getNames(loadDefaultDB(), mods@annotation$Module)
+# a HUMAnN KO table: per taxon, or per sample
 mods <- rpm("ko.tsv", annotation = "humann")
 mods <- rpm("ko.tsv", annotation = "humann", ignore.taxonomy = TRUE)
 }
